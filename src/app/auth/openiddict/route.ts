@@ -1,4 +1,5 @@
-import { getClientConfig, getSession, clientConfig } from '@/lib'
+import { GetUserInfo } from '@/filearch_api/user'
+import { getClientConfig, getSession, clientConfig, RegistrationInfo } from '@/lib'
 import { headers } from 'next/headers'
 import { NextRequest } from 'next/server'
 import * as client from 'openid-client'
@@ -22,14 +23,34 @@ export async function GET(request: NextRequest) {
   const { sub } = claims
   // call userinfo endpoint to get user info
   const userinfo = await client.fetchUserInfo(openIdClientConfig, access_token, sub)
+
+  // get filearch registration data
+  const filearchUserData = await GetUserInfo(access_token);
+  let registrationInfo: RegistrationInfo | undefined = undefined;
+  if (filearchUserData != null) {
+    registrationInfo = {
+      user_id: filearchUserData.id,
+      username: filearchUserData.username,
+      root_folder_id: filearchUserData.root_folder_id
+    }
+  }
+
   // store userinfo in session
   session.userInfo = {
     sub: userinfo.sub,
-    name: userinfo.given_name!,
+    first_name: userinfo.given_name!,
+    last_name: userinfo.family_name!,
     email: userinfo.email!,
     email_verified: userinfo.email_verified!,
+    registration_info: registrationInfo
   }
 
   await session.save()
-  return Response.redirect(clientConfig.post_login_route)
+
+  if (filearchUserData == null) {
+    // redirect to registration
+    return Response.redirect(clientConfig.registration_route);
+  } else { 
+    return Response.redirect(clientConfig.post_login_route);
+  }
 }
