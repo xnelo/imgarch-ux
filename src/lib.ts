@@ -13,7 +13,7 @@ export const clientConfig = {
   grant_type: 'authorization_code',
   post_login_route: `${process.env.NEXT_PUBLIC_APP_URL}`,
   registration_route: `${process.env.NEXT_PUBLIC_APP_URL}/registration`,
-  code_challenge_method: 'S256',
+  code_challenge_method: 'S256'
 }
 
 export interface RegistrationInfo {
