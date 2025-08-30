@@ -1,8 +1,11 @@
 import Login from '@/components/Login'
 import { getSession } from '@/lib/lib'
+import logger from '@/lib/logger';
 
 export default async function Home() {
-  const session = await getSession()
+  const session = await getSession();
+  logger.debug(JSON.stringify(session, null, 2));
+
   if (session.userInfo === undefined
     || session.userInfo.registration_info === undefined) {
       // redirect to registration page
@@ -25,9 +28,6 @@ export default async function Home() {
           Welcome back
         </h1>
         <p>Sign in to your account to continue.</p>
-        <div>
-          <pre>{JSON.stringify(session, null, 2)}</pre>
-        </div>
         <Login />
       </div>
     </main>
