@@ -1,7 +1,7 @@
 "use server";
 
 import { CreateNewUser, FilearchNewUserPayload, FilearchUserData } from "@/filearch_api/user";
-import { clientConfig, getSession } from "@/lib";
+import { clientConfig, getSession } from "@/lib/lib";
 import { redirect } from "next/navigation";
 
 type SubmitRegistrationActionState = {

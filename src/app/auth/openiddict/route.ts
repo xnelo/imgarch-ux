@@ -1,5 +1,5 @@
 import { GetUserInfo } from '@/filearch_api/user'
-import { getClientConfig, getSession, clientConfig, RegistrationInfo } from '@/lib'
+import { getClientConfig, getSession, clientConfig, RegistrationInfo } from '@/lib/lib'
 import { headers } from 'next/headers'
 import { NextRequest } from 'next/server'
 import * as client from 'openid-client'

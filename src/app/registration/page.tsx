@@ -1,5 +1,5 @@
 import RegistrationForm from '@/components/registration/RegistrationForm';
-import { getSession } from '@/lib';
+import { getSession } from '@/lib/lib';
 
 export default async function Registration() {
   const session = await getSession();
