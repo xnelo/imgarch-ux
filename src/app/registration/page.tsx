@@ -4,9 +4,9 @@ import { getSession } from '@/lib/lib';
 export default async function Registration() {
   const session = await getSession();
   return (
-    <main className="flex min-h-[100dvh] items-center justify-center bg-gray-100 px-4 dark:bg-gray-900">
-      <div className="w-full max-w-md space-y-4 text-center">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-50">
+    <main>
+      <div style={{marginTop: '15vh', width: '33vw', marginLeft: '33vw'}}>
+        <h1>
             REGISTRATION PAGE
         </h1>
         <RegistrationForm 

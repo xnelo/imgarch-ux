@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     if (nameToCheck === null) {
         return Response.json(false);
     } else {
-        const usernameAvailable: Boolean = await IsUsernameAvailable(nameToCheck);
+        const usernameAvailable: boolean = await IsUsernameAvailable(nameToCheck);
         return Response.json(usernameAvailable);
     }
 }

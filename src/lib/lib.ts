@@ -60,7 +60,7 @@ export const sessionOptions: SessionOptions = {
 
 export async function getSession(): Promise<IronSession<SessionData>> {
   const cookiesList = await cookies()
-  let session = await getIronSession<SessionData>(cookiesList, sessionOptions)
+  const session = await getIronSession<SessionData>(cookiesList, sessionOptions)
   if (!session.isLoggedIn) {
     session.access_token = defaultSession.access_token
     session.userInfo = defaultSession.userInfo

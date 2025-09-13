@@ -1,4 +1,4 @@
-export async function IsUsernameAvailable(nameToCheck: String): Promise<Boolean> {
+export async function IsUsernameAvailable(nameToCheck: string): Promise<boolean> {
     try {
         const response = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/username/available?username=" + nameToCheck,
             {

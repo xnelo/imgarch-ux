@@ -2,7 +2,6 @@
 
 import { useActionState} from "react";
 import Username from "./Username";
-import RegistrationCancel from "./RegistrationCancel";
 import { SubmitRegistrationForm } from "@/app/registration/actions";
 
 interface RegistrationFormProps {
@@ -13,18 +12,32 @@ interface RegistrationFormProps {
 
 const RegistrationForm: React.FC<RegistrationFormProps> = ({first_name, last_name, email}) => {
     
-  const [actionState, formAction] = useActionState(SubmitRegistrationForm, {message:''})
+    const [actionState, formAction] = useActionState(SubmitRegistrationForm, {message:''});
 
     return (
         <div>
-            <p>ErrorMessage: {actionState.message}</p>
+            <p className={actionState.message === '' ? 'invisible' : 'visible'}>ErrorMessage: {actionState.message}</p>
             <form action={formAction}>
-                <input name="first_name" type="text" value={first_name} readOnly/>
-                <input name="last_name" type="text" value={last_name} readOnly/>
-                <input name="email" type="text" value={email} readOnly/>
-                <Username username={actionState.payload !== undefined ? actionState.payload.get("registration_username")?.toString() : undefined}/>
-                <button type="submit">Register</button> 
-                <RegistrationCancel />
+                <div className='mb-3'>
+                    <label className='form-label' htmlFor="txtFirstName">First Name</label>
+                    <input className='form-control' id="txtFirstName" name="first_name" type="text" value={first_name} readOnly/>
+                </div>
+                <div className='mb-3'>
+                    <label className='form-label' htmlFor="txtLastName">Last Name</label>
+                    <input className='form-control' id="txtLastName" name="last_name" type="text" value={last_name} readOnly/>
+                </div>
+                <div className='mb-3'>
+                    <label className='form-label' htmlFor="txtEmail">Email</label>
+                    <input className='form-control' id="txtEmail" name="email" type="text" value={email} readOnly/>
+                </div>
+                <div className='mb-3'>
+                    <label className='form-label' htmlFor="txtUsername" >Username</label>
+                    <Username username={actionState.payload !== undefined ? actionState.payload.get("registration_username")?.toString() : undefined}/>
+                </div>
+                <div className='row justify-content-center'>
+                    <button className='btn btn-primary col-3' type="submit">Register</button> 
+                    <button className='btn btn-secondary col-3 offset-md-1' type="button" onClick={() => {window.location.href = '/auth/logout'}}>Cancel</button>
+                </div>
             </form>
         </div>
     );

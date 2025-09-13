@@ -1,4 +1,3 @@
-import { access } from "fs";
 import { ErrorResponse, ActionResponse, FilearchAPIResponse } from "./FilearchAPI";
 
 export interface FilearchUserData {
@@ -17,7 +16,7 @@ export interface FilearchNewUserPayload {
     email: string
 }
 
-export async function GetUserInfo(accessToken: String): Promise<FilearchUserData | null> {
+export async function GetUserInfo(accessToken: string): Promise<FilearchUserData | null> {
     try{
         const response = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/user",
         {
