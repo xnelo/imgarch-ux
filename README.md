@@ -34,3 +34,12 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+# Third Party Libraries
+
+Here is a list of all third party libraries used making this project.
+
+## Theme
+
+The theme for the website is the "Lux" theme from [bootswatch.com](https://bootswatch.com/lux/). It was made by Thomas Park and released
+under the MIT License.
