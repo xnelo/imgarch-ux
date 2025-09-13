@@ -12,7 +12,23 @@ export const clientConfig = {
   response_type: 'code',
   grant_type: 'authorization_code',
   post_login_route: `${process.env.NEXT_PUBLIC_APP_URL}`,
-  code_challenge_method: 'S256',
+  registration_route: `${process.env.NEXT_PUBLIC_APP_URL}/registration`,
+  code_challenge_method: 'S256'
+}
+
+export interface RegistrationInfo {
+  user_id: number
+  username: string
+  root_folder_id: number
+}
+
+export interface UserInfo {
+  sub: string
+  first_name: string
+  last_name: string
+  email: string
+  email_verified: boolean
+  registration_info?: RegistrationInfo
 }
 
 export interface SessionData {
@@ -20,12 +36,7 @@ export interface SessionData {
   access_token?: string
   code_verifier?: string
   state?: string
-  userInfo?: {
-    sub: string
-    name: string
-    email: string
-    email_verified: boolean
-  }
+  userInfo?: UserInfo
 }
 
 export const defaultSession: SessionData = {
@@ -49,7 +60,7 @@ export const sessionOptions: SessionOptions = {
 
 export async function getSession(): Promise<IronSession<SessionData>> {
   const cookiesList = await cookies()
-  let session = await getIronSession<SessionData>(cookiesList, sessionOptions)
+  const session = await getIronSession<SessionData>(cookiesList, sessionOptions)
   if (!session.isLoggedIn) {
     session.access_token = defaultSession.access_token
     session.userInfo = defaultSession.userInfo
