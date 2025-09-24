@@ -1,0 +1,46 @@
+.FolderContinuityLine {
+    border-left: var(--bs-gray-600) 1px solid;
+    margin-left: 0.3rem;
+}
+
+.FolderContinuityLine_NoChildPadding {
+    padding-left: 0px;
+}
+
+.FolderContinuityLine_ChildPadding{
+    padding-left: 0.7rem;
+}
+
+.ChildList {
+    list-style-type: none;
+    padding-left: 1rem;
+}
+
+.ExpanderBase {
+    font-size: 0.75rem;
+    padding-right: 0.25rem;
+}
+
+.FolderName {
+    cursor: pointer;
+    text-decoration: none;
+    margin: 1px;
+}
+
+.FolderName:hover {
+    text-decoration: underline;
+    margin: 0px;
+    border: black 1px dotted;
+}
+
+.FolderName::selection {
+    /* remove the selection background color change */
+    background-color: inherit;
+}
+
+.Foldername_Selected {
+    background-color: #55595c33;
+    margin: 0px;
+    border: black 1px solid !important;
+    font-weight: 600 !important;
+}
