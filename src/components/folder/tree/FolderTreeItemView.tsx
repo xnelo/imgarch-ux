@@ -1,10 +1,10 @@
 'use client'
 
 import { MouseEvent, useState } from "react";
-import { FolderItem } from "./FolderItem";
-import styles from "./FolderView.module.css";
+import { FolderItem } from "../FolderItem";
+import styles from "./FolderTree.module.css";
 
-export default function FolderItemView({data, selectFolderFunc, selectedFolderState}:{data:FolderItem, selectFolderFunc:(selectedFolderId:number)=>void, selectedFolderState:number}){
+export default function FolderTreeItemView({data, selectFolderFunc, selectedFolderState}:{data:FolderItem, selectFolderFunc:(selectedFolderId:number)=>void, selectedFolderState:number}){
     let [isExpanded, setIsExpanded] = useState(false);
     
 
@@ -21,7 +21,7 @@ export default function FolderItemView({data, selectFolderFunc, selectedFolderSt
             <div className={isExpanded ? styles.FolderContinuityLine : "d-none"}>
                 <ul className={styles.ChildList}>
                     {data.children.map((child: FolderItem) => (
-                        <li key={child.id}><FolderItemView data={child} selectFolderFunc={selectFolderFunc} selectedFolderState={selectedFolderState}/></li>
+                        <li key={child.id}><FolderTreeItemView data={child} selectFolderFunc={selectFolderFunc} selectedFolderState={selectedFolderState}/></li>
                     ))}
                 </ul>
             </div>

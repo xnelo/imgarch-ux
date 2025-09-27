@@ -25,6 +25,7 @@
     cursor: pointer;
     text-decoration: none;
     margin: 1px;
+    white-space: nowrap;
 }
 
 .FolderName:hover {
