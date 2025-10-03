@@ -1,5 +1,6 @@
 import { Console } from "console";
 import { ActionResponse, FilearchAPI_IdObject, HandleErrorResponse, PaginationContract, SortDirection } from "./FilearchAPI";
+import logger from "@/lib/logger";
 
 const FOLDERS_LIMIT_PER_REQUEST:number = 3;
 
@@ -7,6 +8,72 @@ export interface FilearchFolder extends FilearchAPI_IdObject {
     owner_user_id: number;
     parent_id: number;
     folder_name: string;
+}
+
+interface FilearchNewFolderPayload {
+    owner_user_id: number,
+    parent_id: number,
+    folder_name: string
+}
+
+interface FilearchRenameFolderPayload {
+    folder_name: string
+}
+
+export async function AddFolder(accessToken: string, newFolderData: FilearchNewFolderPayload) {
+    try {
+        const response = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/folder", 
+            {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json',
+                    'Authorization': 'Bearer ' + accessToken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newFolderData)
+            });
+        
+            if (response.status != 200) {
+                logger.error('Error while adding folder');
+                HandleErrorResponse(await response.json());
+                return null;
+            }
+
+            const data = await response.json();
+            const actionResponse: ActionResponse<FilearchFolder> = data.action_responses[0];
+            return actionResponse.data;
+    } catch (error) {
+        logger.error("Error adding folder: ", error);
+        return null;
+    }
+}
+
+export async function RenameFolder(accessToken: string, folderId: number, renameFolderData: FilearchRenameFolderPayload) {
+    try {
+        const response = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/folder/" + folderId, 
+            {
+                method: 'PATCH',
+                headers: {
+                    'accept': 'application/json',
+                    'Authorization': 'Bearer ' + accessToken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(renameFolderData)
+            });
+        
+            if (response.status != 200) {
+                logger.error('Error while renaming folder');
+                HandleErrorResponse(await response.json());
+                return null;
+            }
+
+            const data = await response.json();
+            const actionResponse: ActionResponse<FilearchFolder> = data.action_responses[0];
+            return actionResponse.data;
+    } catch (error) {
+        logger.error("Error renaming folder: ", error);
+        return null;
+    }
 }
 
 export async function GetAllFolders(accessToken:string): Promise<FilearchFolder[] | null> {

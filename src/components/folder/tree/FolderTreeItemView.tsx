@@ -5,8 +5,7 @@ import { FolderItem } from "../FolderItem";
 import styles from "./FolderTree.module.css";
 
 export default function FolderTreeItemView({data, selectFolderFunc, selectedFolderState}:{data:FolderItem, selectFolderFunc:(selectedFolderId:number)=>void, selectedFolderState:number}){
-    let [isExpanded, setIsExpanded] = useState(false);
-    
+    let [isExpanded, setIsExpanded] = useState(false);    
 
     function toggleDropdownEvent(event: MouseEvent<HTMLElement>){
         setIsExpanded(!isExpanded);

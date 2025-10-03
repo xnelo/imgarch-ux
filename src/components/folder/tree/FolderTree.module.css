@@ -45,3 +45,11 @@
     border: black 1px solid !important;
     font-weight: 600 !important;
 }
+
+.FolderTree_ActionButtonSizing {
+    padding: 1px 6px;
+}
+
+.FolderTree_ActionButtonIconSizing {
+    font-size: 1rem;
+}
