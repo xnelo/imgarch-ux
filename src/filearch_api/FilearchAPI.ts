@@ -54,3 +54,24 @@ export function HandleActionResponse<T>(actionResponse: ActionResponse<T>) : voi
 export function HandleErrorResponse<T>(apiResponse: FilearchAPIResponse<T>) : void {
     apiResponse.action_responses.forEach(HandleActionResponse)
 }
+
+function aggregateErrorResponseArrays(prevVal: ErrorResponse[] | null | undefined, currVal: ErrorResponse[]|null) {
+  if (prevVal === undefined || prevVal === null) {
+    return [];
+  } else {
+    return prevVal.concat(currVal !== null ? currVal : []);
+  }
+}
+
+export function AggregateErrorResponse<T>(apiResponse: FilearchAPIResponse<T>) : ErrorResponse[] {
+  const res = apiResponse.action_responses
+  .filter(ar=>ar.errors !== null)
+  .map(ar=>ar.errors)
+  .reduce(aggregateErrorResponseArrays, []);
+
+  if (res === null) {
+    return [];
+  } else {
+    return res;
+  }
+}

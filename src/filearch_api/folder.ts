@@ -1,6 +1,7 @@
 import { Console } from "console";
-import { ActionResponse, FilearchAPI_IdObject, HandleErrorResponse, PaginationContract, SortDirection } from "./FilearchAPI";
+import { ActionResponse, ActionType, FilearchAPI_IdObject, HandleErrorResponse, PaginationContract, ResourceType, SortDirection } from "./FilearchAPI";
 import logger from "@/lib/logger";
+import { MakeAPICall } from "./FilearchAPI_ServerFunctions";
 
 const FOLDERS_LIMIT_PER_REQUEST:number = 3;
 
@@ -74,6 +75,19 @@ export async function RenameFolder(accessToken: string, folderId: number, rename
         logger.error("Error renaming folder: ", error);
         return null;
     }
+}
+
+export async function DeleteFolder(accessToken: string, idToDelete: number): Promise<ActionResponse<FilearchFolder>[]> {
+    return MakeAPICall<FilearchFolder>(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/folder/" + idToDelete,
+            {
+                method: 'DELETE',
+                headers: {
+                    'accept': 'application/json',
+                    'Authorization': 'Bearer ' + accessToken
+                }
+            }, 
+            ResourceType.FOLDER, 
+            ActionType.DELETE);
 }
 
 export async function GetAllFolders(accessToken:string): Promise<FilearchFolder[] | null> {

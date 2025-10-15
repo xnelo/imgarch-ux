@@ -40,6 +40,25 @@ function addFolderItemToTree(root: FolderItem, toAdd: FolderItem) : FolderItem {
     return newRoot;
 }
 
+function removeFolderItemFromTree(root: FolderItem, idToDelete: number) : FolderItem {
+    const newRoot:FolderItem = {
+        id: root.id,
+        name: root.name,
+        parentId: root.parentId,
+        children: []
+    };
+
+    for(const child of root.children) {
+        if (child.id === idToDelete){
+            continue;
+        } else {
+            newRoot.children.push(removeFolderItemFromTree(child, idToDelete));
+        }
+    }
+
+    return newRoot;
+}
+
 function buildInitialTree(allFolders:FilearchFolder[]) : FolderItem | undefined{
     let allFolderItems: Map<number, FolderItem> = new Map();
     let rootFolderId = -1;
@@ -118,6 +137,10 @@ export default function FolderView({folders}:{folders: Promise<FilearchFolder[] 
         setRootFolder(prevData=>(prevData!==undefined) ? updateFolderName(prevData, toRename.id, toRename.folder_name):undefined);
     }
 
+    function deleteFolderEventComplete(deletedId: number) {
+        setRootFolder(prevData=>(prevData!==undefined) ? removeFolderItemFromTree(prevData, deletedId): undefined);
+    }
+
     return (
     <div className='container-fluid'>
         <div className="position-absolute bg-body-tertiary"
@@ -131,7 +154,7 @@ export default function FolderView({folders}:{folders: Promise<FilearchFolder[] 
             <div className="container">
                 <AddFolder selectedFolder={selectedFolder} addFolderEventComplete={addFolderEventComplete}/>
                 <RenameFolder selectedFolderId={selectedFolder} selectedFolderData={selectedFolderItem} renameFolderEventComplete={renameFolderEventComplete}/>
-                <DeleteFolder selectedFolder={selectedFolder}/>
+                <DeleteFolder selectedFolder={selectedFolder} selectedFolderData={selectedFolderItem} deleteFolderEventComplete={deleteFolderEventComplete}/>
                 <MoveFolder selectedFolder={selectedFolder}/>
             </div>
             <div 

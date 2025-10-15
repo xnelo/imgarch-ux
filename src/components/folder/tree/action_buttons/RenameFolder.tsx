@@ -12,7 +12,10 @@ export default function RenameFolder({selectedFolderId, selectedFolderData, rena
     
     const [newFolderName, setNewFolderName] = useState((selectedFolderData === undefined) ? "" : selectedFolderData.name);
     
-    const handleShow = () => setShow(true);
+    const handleShow = (folderName:string|undefined) => {
+        setNewFolderName((selectedFolderData === undefined) ? "" : selectedFolderData.name);
+        setShow(true);
+    }
     const handleClose = () => setShow(false);
     const handleRenameFolder = async () => {
         setShow(false);
@@ -55,7 +58,7 @@ export default function RenameFolder({selectedFolderId, selectedFolderData, rena
         <ActionButtonBase 
             iconName="bi-input-cursor-text" 
             selectedFolder={selectedFolderId}
-            onClickEvent={handleShow} />
+            onClickEvent={()=>handleShow(selectedFolderData?.name)} />
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>Rename Folder</Modal.Title>
