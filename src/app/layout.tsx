@@ -3,6 +3,8 @@ import "./theme/lux/bootstrap.min.css";
 import "./theme/icons/bootstrap-icons.css";
 import "./globals.css";
 import BootstrapClient from "@/components/BootstrapClient";
+import Toaster from "@/components/custom_toast/Toaster";
+
 
 
 export const metadata: Metadata = {
@@ -20,6 +22,7 @@ export default function RootLayout({
       <body>
         {children}
         <BootstrapClient />
+        <Toaster />
       </body>
     </html>
   );
