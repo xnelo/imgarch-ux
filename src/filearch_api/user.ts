@@ -1,4 +1,4 @@
-import { ErrorResponse, ActionResponse, FilearchAPIResponse } from "./FilearchAPI";
+import { ActionResponse, HandleErrorResponse } from "./FilearchAPI";
 
 export interface FilearchUserData {
     id: number,
@@ -36,16 +36,6 @@ export async function GetUserInfo(accessToken: string): Promise<FilearchUserData
         console.error('Error :', error);
         return null;
     }
-}
-
-function HandleActionResponse<T>(actionResponse: ActionResponse<T>) : void {
-    actionResponse.errors!.forEach((error:ErrorResponse) => {
-                    console.error("Error response from API: ", error);
-                });
-}
-
-function HandleErrorResponse<T>(apiResponse: FilearchAPIResponse<T>) : void {
-    apiResponse.action_responses.forEach(HandleActionResponse)
 }
 
 export async function CreateNewUser(accessToken: string, payload: FilearchNewUserPayload): Promise<FilearchUserData | null> {
