@@ -31,7 +31,7 @@
 .FolderName:hover {
     text-decoration: underline;
     margin: 0px;
-    border: black 1px dotted;
+    border: var(--bs-link-hover-color) 1px dotted;
 }
 
 .FolderName::selection {
@@ -40,9 +40,9 @@
 }
 
 .Foldername_Selected {
-    background-color: #55595c33;
+    background-color: rgba(var(--bs-body-color-rgb), 0.2);
     margin: 0px;
-    border: black 1px solid !important;
+    border: var(--bs-primary) 1px solid !important;
     font-weight: 600 !important;
 }
 
@@ -52,4 +52,16 @@
 
 .FolderTree_ActionButtonIconSizing {
     font-size: 1rem;
+}
+
+.FolderTree_Droppable {
+    border: var(--bs-primary) 1px solid !important;
+}
+
+.FolderTree_NotDroppable {
+    border: var(--bs-danger) 1px solid !important;
+}
+
+.FolderTree_Dragging {
+    opacity: 50%;
 }

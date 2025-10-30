@@ -2,22 +2,20 @@
 
 import { FilearchFolder } from "@/filearch_api/folder";
 import { Suspense, use, useState } from "react";
-import { FolderItem } from "./FolderItem";
+import { FolderItem, FolderItemImpl } from "./FolderItem";
 import FolderContentView from "./content/FolderContentView";
 import FolderTreeItemView from "./tree/FolderTreeItemView";
 import AddFolder from "./tree/action_buttons/AddFolder";
 import RenameFolder from "./tree/action_buttons/RenameFolder";
 import DeleteFolder from "./tree/action_buttons/DeleteFolder";
 import MoveFolder from "./tree/action_buttons/MoveFolder";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 export const NO_FOLDER_SELECTED : number = -1;
 
 function updateFolderName(root: FolderItem, folderId:number, newName:string) {
-    const newRoot: FolderItem = {
-        id: root.id, 
-        name: root.id == folderId ? newName : root.name, 
-        parentId: root.parentId, 
-        children: []};
+    const newRoot: FolderItem = new FolderItemImpl(root.id, root.id == folderId ? newName : root.name, root.parentId);
 
     for (const child of root.children) {    
         newRoot.children.push(updateFolderName(child, folderId, newName));
@@ -27,7 +25,7 @@ function updateFolderName(root: FolderItem, folderId:number, newName:string) {
 }
 
 function addFolderItemToTree(root: FolderItem, toAdd: FolderItem) : FolderItem {
-    const newRoot:FolderItem = {id: root.id, name: root.name, parentId: root.parentId, children: []};
+    const newRoot:FolderItem = new FolderItemImpl(root.id, root.name, root.parentId);
     
     if (root.id == toAdd.parentId) {
         newRoot.children.push(toAdd);
@@ -41,12 +39,7 @@ function addFolderItemToTree(root: FolderItem, toAdd: FolderItem) : FolderItem {
 }
 
 function removeFolderItemFromTree(root: FolderItem, idToDelete: number) : FolderItem {
-    const newRoot:FolderItem = {
-        id: root.id,
-        name: root.name,
-        parentId: root.parentId,
-        children: []
-    };
+    const newRoot:FolderItem = new FolderItemImpl(root.id, root.name, root.parentId);
 
     for(const child of root.children) {
         if (child.id === idToDelete){
@@ -63,7 +56,7 @@ function buildInitialTree(allFolders:FilearchFolder[]) : FolderItem | undefined{
     let allFolderItems: Map<number, FolderItem> = new Map();
     let rootFolderId = -1;
     for (const folder of allFolders) {
-        const folderItem: FolderItem = {id: folder.id, name: folder.folder_name, parentId: folder.parent_id, children: []};
+        const folderItem: FolderItem = new FolderItemImpl(folder.id, folder.folder_name, folder.parent_id);
         allFolderItems.set(folderItem.id, folderItem);
     }
 
@@ -129,7 +122,7 @@ export default function FolderView({folders}:{folders: Promise<FilearchFolder[] 
     }
 
     function addFolderEventComplete(folderToAdd: FilearchFolder) {
-        const folderItem: FolderItem = {id: folderToAdd.id, name: folderToAdd.folder_name, parentId: folderToAdd.parent_id, children: []};
+        const folderItem: FolderItem = new FolderItemImpl(folderToAdd.id, folderToAdd.folder_name, folderToAdd.parent_id);
         setRootFolder(prevData=>(prevData!==undefined) ? addFolderItemToTree(prevData, folderItem) : undefined);
     }
 
@@ -142,6 +135,7 @@ export default function FolderView({folders}:{folders: Promise<FilearchFolder[] 
     }
 
     return (
+        <DndProvider backend={HTML5Backend}>
     <div className='container-fluid'>
         <div className="position-absolute bg-body-tertiary"
             style={{
@@ -182,5 +176,7 @@ export default function FolderView({folders}:{folders: Promise<FilearchFolder[] 
                 <FolderContentView selectedFolderItem={selectedFolderItem}/>
             </Suspense>
         </div>
-    </div>);
+    </div>
+    </DndProvider>
+    );
 }
