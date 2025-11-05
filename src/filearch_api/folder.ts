@@ -90,6 +90,21 @@ export async function DeleteFolder(accessToken: string, idToDelete: number): Pro
             ActionType.DELETE);
 }
 
+export async function MoveFolder(accessToken: string, idToMove: number, idNewParent: number): Promise<ActionResponse<FilearchFolder>[]> {
+  return MakeAPICall<FilearchFolder>(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/folder/" + idToMove,
+    {
+      method: 'PATCH',
+      headers: {
+        'accept': 'application/json',
+        'Authorization': 'Bearer ' + accessToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({"parent_id":idNewParent})
+    },
+    ResourceType.FOLDER,
+    ActionType.UPDATE);
+}
+
 export async function GetAllFolders(accessToken:string): Promise<FilearchFolder[] | null> {
     const data: FilearchFolder[] | null = await GetAllPaginatedData<FilearchFolder>(accessToken, process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/folder", SortDirection.ASCENDING, FOLDERS_LIMIT_PER_REQUEST);
     return data;
