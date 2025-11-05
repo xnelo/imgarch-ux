@@ -6,8 +6,11 @@ import styles from "./FolderTree.module.css";
 import { useDrag, useDrop } from "react-dnd";
 import { DragTypes } from "../dnd/DragTypes";
 import { Button, Modal } from "react-bootstrap";
+import toast from "react-hot-toast";
+import { ActionResponse } from "@/filearch_api/FilearchAPI";
+import { FilearchFolder } from "@/filearch_api/folder";
 
-export default function FolderTreeItemView({data, selectFolderFunc, selectedFolderState}:{data:FolderItem, selectFolderFunc:(selectedFolderId:number)=>void, selectedFolderState:number}){
+export default function FolderTreeItemView({data, selectFolderFunc, selectedFolderState, moveFolderEventComplete}:{data:FolderItem, selectFolderFunc:(selectedFolderId:number)=>void, selectedFolderState:number, moveFolderEventComplete:(idToMove: number, idNewParent: number, idOldParent: number)=>void}){
     const [isExpanded, setIsExpanded] = useState(false);
     const [folderToMove, setFolderToMove] = useState<FolderItem|undefined>(undefined);
     const [folderToMoveTo, setFolderToMoveTo] = useState<FolderItem|undefined>(undefined);
@@ -52,7 +55,48 @@ export default function FolderTreeItemView({data, selectFolderFunc, selectedFold
     const handleMoveFolder = async () => {
       setShow(false);
 
-      // TODO: move folder code goes here
+      if (folderToMove === undefined) {
+        toast.error("No folder selected to move.");
+        return;
+      } else if (folderToMoveTo === undefined) {
+        toast.error("No folder to move into.");
+        return;
+      }
+
+      const moveFolderRequest = {
+        id: folderToMove.id,
+        new_parent_id: folderToMoveTo.id
+      }
+
+      try {
+        const response = await fetch("/folder/move",
+          {
+            method: 'POST',
+            headers: {
+              'accept': 'application/json'
+            },
+            body: JSON.stringify(moveFolderRequest)
+          });
+
+        if (response.status != 200) {
+          toast.error("Could not move folder '" + folderToMove.name + "'.");
+        } else { 
+          const moveFolderData:ActionResponse<FilearchFolder>[] = await response.json();
+          console.debug("Move Folder Response: {}", moveFolderData);
+          moveFolderData.forEach(actionResponse => {
+            if (actionResponse.errors !== null) {
+              actionResponse.errors.forEach(error => toast.error(<div>{error.error_message}<br/>Error Code: {error.error_code}</div>));
+            } else if (actionResponse.data !== null) {
+              //move completed
+              moveFolderEventComplete(folderToMove.id, folderToMoveTo.id, folderToMove.parentId);
+            } else {
+              toast.error("There were no errors nor data... this should't happen.");
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error moving folder: ", error);
+      }
     };
 
     return (
@@ -96,7 +140,8 @@ export default function FolderTreeItemView({data, selectFolderFunc, selectedFold
                       <li key={child.id}>
                           <FolderTreeItemView data={child} 
                                               selectFolderFunc={selectFolderFunc} 
-                                              selectedFolderState={selectedFolderState}/>
+                                              selectedFolderState={selectedFolderState}
+                                              moveFolderEventComplete={moveFolderEventComplete}/>
                       </li>
                   ))}
               </ul>

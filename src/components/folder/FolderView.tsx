@@ -8,7 +8,6 @@ import FolderTreeItemView from "./tree/FolderTreeItemView";
 import AddFolder from "./tree/action_buttons/AddFolder";
 import RenameFolder from "./tree/action_buttons/RenameFolder";
 import DeleteFolder from "./tree/action_buttons/DeleteFolder";
-import MoveFolder from "./tree/action_buttons/MoveFolder";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
@@ -134,6 +133,25 @@ export default function FolderView({folders}:{folders: Promise<FilearchFolder[] 
         setRootFolder(prevData=>(prevData!==undefined) ? removeFolderItemFromTree(prevData, deletedId): undefined);
     }
 
+    function moveFolderEventComplete(idToMove: number, idNewParent: number, idOldParent: number) {
+      if (rootFolder === undefined) {
+        setRootFolder(undefined);
+        return;
+      }
+
+      const folderToMove = findItemInTree(rootFolder, idToMove);
+      if (folderToMove === undefined) {
+        return;
+      }
+
+      folderToMove.parentId = idNewParent;
+      
+      setRootFolder(
+        addFolderItemToTree(
+          removeFolderItemFromTree(rootFolder, idToMove), 
+          folderToMove));
+    }
+
     return (
         <DndProvider backend={HTML5Backend}>
     <div className='container-fluid'>
@@ -149,7 +167,6 @@ export default function FolderView({folders}:{folders: Promise<FilearchFolder[] 
                 <AddFolder selectedFolder={selectedFolder} addFolderEventComplete={addFolderEventComplete}/>
                 <RenameFolder selectedFolderId={selectedFolder} selectedFolderData={selectedFolderItem} renameFolderEventComplete={renameFolderEventComplete}/>
                 <DeleteFolder selectedFolder={selectedFolder} selectedFolderData={selectedFolderItem} deleteFolderEventComplete={deleteFolderEventComplete}/>
-                <MoveFolder selectedFolder={selectedFolder}/>
             </div>
             <div 
                 className='position-absolute overflow-y-scroll overflow-x-scroll' 
@@ -160,7 +177,7 @@ export default function FolderView({folders}:{folders: Promise<FilearchFolder[] 
                 <Suspense fallback={<div>Loading...</div>}>
                     {(rootFolder === undefined) 
                     ? <div>NO DATA</div>
-                    : <FolderTreeItemView data={rootFolder} selectFolderFunc={selectFolderEvent} selectedFolderState={selectedFolder} />}
+                    : <FolderTreeItemView data={rootFolder} selectFolderFunc={selectFolderEvent} selectedFolderState={selectedFolder} moveFolderEventComplete={moveFolderEventComplete}/>}
                 </Suspense>
             </div>
         </div>
