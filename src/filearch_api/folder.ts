@@ -3,7 +3,7 @@ import { ActionResponse, ActionType, FilearchAPI_IdObject, HandleErrorResponse, 
 import logger from "@/lib/logger";
 import { MakeAPICall } from "./FilearchAPI_ServerFunctions";
 
-const FOLDERS_LIMIT_PER_REQUEST:number = 3;
+const FOLDERS_LIMIT_PER_REQUEST:number = 100;
 
 export interface FilearchFolder extends FilearchAPI_IdObject {
     owner_user_id: number;

@@ -18,7 +18,6 @@ export default function AddFolder({selectedFolder, addFolderEventComplete}:{sele
     const handleAddFolder = async () => {
         setShow(false);
         
-        alert("New Folder name = " + newFolderName);
         const folderRequest = {
             owner_user_id: session.session?.userInfo?.registration_info?.user_id,
             parent_id: selectedFolder,

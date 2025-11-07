@@ -5,6 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import ActionButtonBase from "./ActionButtonBase";
 import { FolderItem } from "../../FolderItem";
 import { FilearchFolder } from "@/filearch_api/folder";
+import toast from "react-hot-toast";
 
 export default function RenameFolder({selectedFolderId, selectedFolderData, renameFolderEventComplete}: {selectedFolderId:number, selectedFolderData: FolderItem|undefined, renameFolderEventComplete:(toRename:FilearchFolder)=>void}) {
 
@@ -21,11 +22,9 @@ export default function RenameFolder({selectedFolderId, selectedFolderData, rena
         setShow(false);
         
         if (selectedFolderData === undefined) {
-            alert("No folder selected.");
+            toast.error("No folder selected.");
             return;
         }
-
-        alert("Rename Folder to " + newFolderName);
 
         const renameRequest = {
             id: selectedFolderData.id,

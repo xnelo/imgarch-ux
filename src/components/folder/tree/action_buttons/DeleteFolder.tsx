@@ -55,7 +55,7 @@ export default function DeleteFolder({selectedFolder, selectedFolderData, delete
                 <Modal.Title>Delete Folder</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <span>Are you sure you want to delete '{selectedFolderData?.name}({selectedFolder})'?</span>
+                <span>Are you sure you want to delete '{selectedFolderData?.name}'?</span>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose}>
