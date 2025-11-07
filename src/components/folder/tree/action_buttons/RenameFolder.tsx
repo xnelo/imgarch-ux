@@ -6,6 +6,7 @@ import ActionButtonBase from "./ActionButtonBase";
 import { FolderItem } from "../../FolderItem";
 import { FilearchFolder } from "@/filearch_api/folder";
 import toast from "react-hot-toast";
+import { NO_FOLDER_SELECTED } from "../../FolderView";
 
 export default function RenameFolder({selectedFolderId, selectedFolderData, renameFolderEventComplete}: {selectedFolderId:number, selectedFolderData: FolderItem|undefined, renameFolderEventComplete:(toRename:FilearchFolder)=>void}) {
 
@@ -13,7 +14,12 @@ export default function RenameFolder({selectedFolderId, selectedFolderData, rena
     
     const [newFolderName, setNewFolderName] = useState((selectedFolderData === undefined) ? "" : selectedFolderData.name);
     
-    const handleShow = (folderName:string|undefined) => {
+    const handleShow = () => {
+        if (selectedFolderData !== undefined && selectedFolderData.parentId === null) {
+          toast.error("You are not allowed to rename the root folder.");
+          return;
+        }
+
         setNewFolderName((selectedFolderData === undefined) ? "" : selectedFolderData.name);
         setShow(true);
     }
@@ -52,12 +58,18 @@ export default function RenameFolder({selectedFolderId, selectedFolderData, rena
         }
     };
 
+    function renameFolderDisableCheck() :boolean {
+      return selectedFolderId === NO_FOLDER_SELECTED 
+        || (selectedFolderData !== undefined && selectedFolderData.parentId == null);
+    }
+
     return (
         <>
         <ActionButtonBase 
             iconName="bi-input-cursor-text" 
             selectedFolder={selectedFolderId}
-            onClickEvent={()=>handleShow(selectedFolderData?.name)} />
+            onClickEvent={()=>handleShow()}
+            isDisabledCheck={renameFolderDisableCheck} />
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>Rename Folder</Modal.Title>

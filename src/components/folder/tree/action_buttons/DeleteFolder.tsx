@@ -7,6 +7,7 @@ import Button from 'react-bootstrap/Button';
 import { ActionResponse } from "@/filearch_api/FilearchAPI";
 import { FilearchFolder } from "@/filearch_api/folder";
 import toast from 'react-hot-toast';
+import { NO_FOLDER_SELECTED } from "../../FolderView";
 
 export default function DeleteFolder({selectedFolder, selectedFolderData, deleteFolderEventComplete}: {selectedFolder: number, selectedFolderData: FolderItem|undefined, deleteFolderEventComplete: (deletedId: number)=>void}) {
     const [show, setShow] = useState(false);
@@ -44,12 +45,18 @@ export default function DeleteFolder({selectedFolder, selectedFolderData, delete
         }
     }
 
+    function deleteFolderDisableCheck() :boolean {
+          return selectedFolder === NO_FOLDER_SELECTED 
+            || (selectedFolderData !== undefined && selectedFolderData.parentId == null);
+        }
+
     return (
         <>
         <ActionButtonBase 
             iconName="bi-folder-minus" 
             selectedFolder={selectedFolder}
-            onClickEvent={handleShow} />
+            onClickEvent={handleShow} 
+            isDisabledCheck={deleteFolderDisableCheck}/>
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>Delete Folder</Modal.Title>

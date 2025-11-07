@@ -4,14 +4,23 @@ import { MouseEvent } from "react";
 import { NO_FOLDER_SELECTED } from "../../FolderView";
 import styles from "../FolderTree.module.css"
 
-export default function ActionButtonBase({iconName, selectedFolder, onClickEvent}:{iconName: string, selectedFolder: number, onClickEvent:(event:MouseEvent<HTMLElement>)=>void}) {
-    
-    return (
-        <button type="button" 
-                className={`btn btn-outline-primary ${styles.FolderTree_ActionButtonSizing}`} 
-                onClick={onClickEvent}
-                disabled={selectedFolder === NO_FOLDER_SELECTED}>
-                    <i className={`bi ${iconName} ${styles.FolderTree_ActionButtonIconSizing}`}/>
-        </button>
-    );
+export default function ActionButtonBase({iconName, selectedFolder, onClickEvent, isDisabledCheck}:{iconName: string, selectedFolder: number, onClickEvent:(event:MouseEvent<HTMLElement>)=>void, isDisabledCheck?:()=>boolean | undefined}) {
+
+  function isDisabled() : boolean{
+    return selectedFolder === NO_FOLDER_SELECTED;
+  }
+
+  if (isDisabledCheck === undefined)
+  {
+    isDisabledCheck = isDisabled
+  }
+
+  return (
+      <button type="button" 
+              className={`btn btn-outline-primary ${styles.FolderTree_ActionButtonSizing}`} 
+              onClick={onClickEvent}
+              disabled={isDisabledCheck()}>
+                  <i className={`bi ${iconName} ${styles.FolderTree_ActionButtonIconSizing}`}/>
+      </button>
+  );
 }

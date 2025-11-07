@@ -172,7 +172,7 @@ export default function FolderView({folders}:{folders: Promise<FilearchFolder[] 
                 className='position-absolute overflow-y-scroll overflow-x-scroll' 
                 style={{
                     width: 'calc(25vw - 2.05rem)',
-                    height: 'calc(100vh - 7.75rem)'
+                    height: 'calc(100vh - 8.75rem)'
                     }}>
                 <Suspense fallback={<div>Loading...</div>}>
                     {(rootFolder === undefined) 
