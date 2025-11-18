@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { FolderItem } from "../FolderItem";
 import { GetFiles } from "./actions/GetFiles";
 import { FileItem } from "./FileItem";
+import { useInView } from "react-intersection-observer";
 import FileItemView from "./FileItemView";
 
 export default function FolderContentView({selectedFolderItem}:{selectedFolderItem:FolderItem | undefined}) {
@@ -11,6 +12,7 @@ export default function FolderContentView({selectedFolderItem}:{selectedFolderIt
     const [data,setData] = useState<FileItem[]>([]);
     const [moreToLoad, setMoreToLoad] = useState<boolean>(true);
     const [lastListItemId, setLastListItemId] = useState<number|null>(null);
+    const { ref, inView } = useInView();
 
     const fetchData = async(isInitialCall:boolean)=>{
       if (selectedFolderItem === undefined) {
@@ -46,6 +48,12 @@ export default function FolderContentView({selectedFolderItem}:{selectedFolderIt
     useEffect(()=>{
       fetchData(true);
     }, [selectedFolderItem]);
+
+    useEffect(()=>{
+      if (inView) {
+        fetchData(false);
+      }
+    }, [inView]);
     
 
     return (
@@ -70,8 +78,13 @@ export default function FolderContentView({selectedFolderItem}:{selectedFolderIt
             <h3>NO DATA</h3>
           </div> : 
           <div className="row" style={{width:'calc(75vw - 1.0rem'}}>
-            {data.map(file => <FileItemView fileData={file}/>)}
-          </div>}
+            {data.map(file => <FileItemView key={file.id} fileData={file}/>)}
+            {moreToLoad &&
+            <div className="text-center" ref={ref}>
+              Loading...
+            </div>}
+          </div>
+          }
         </div>
         <div style={{
           position:'absolute', 
@@ -79,7 +92,7 @@ export default function FolderContentView({selectedFolderItem}:{selectedFolderIt
           top:'calc(100vh - 8.5rem)',
           width: '75vw',
           paddingTop: '.5rem'}}>
-          <button onClick={()=>fetchData(false)} disabled={!moreToLoad}>Load More</button>
+          {/*<button onClick={()=>fetchData(false)} disabled={!moreToLoad}>Load More</button>*/}
         </div>
       </div>
     );
