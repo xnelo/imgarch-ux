@@ -143,6 +143,15 @@ async function GetAllPaginatedData<T extends FilearchAPI_IdObject>(accessToken:s
     return outputData;
 }
 
+/**
+ * @deprecated Use the SinglePaginatedCall function in FilearchAPI_ServerFunctions.ts
+ * @param accessToken 
+ * @param url 
+ * @param after 
+ * @param sortDirection 
+ * @param limit 
+ * @returns 
+ */
 async function SinglePaginatedCall<T>(
     accessToken:string,
     url:string,

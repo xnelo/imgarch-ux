@@ -157,9 +157,10 @@ export default function FolderView({folders}:{folders: Promise<FilearchFolder[] 
     <div className='container-fluid'>
         <div className="position-absolute bg-body-tertiary"
             style={{
-                width: 'calc(25vw - 2rem)',
-                height: 'calc(100vh - 7.75rem)',
-                margin: '1rem',
+                width: 'calc(25vw - 1rem)',
+                height: 'calc(100vh - 5.75rem)',
+                marginLeft: '1rem',
+                paddingTop: '1rem',
                 left: '0px',
                 borderRight: 'var(--bs-border-color) 1px solid'
                 }}>
@@ -171,7 +172,7 @@ export default function FolderView({folders}:{folders: Promise<FilearchFolder[] 
             <div 
                 className='position-absolute overflow-y-scroll overflow-x-scroll' 
                 style={{
-                    width: 'calc(25vw - 2.05rem)',
+                    width: 'calc(25vw - 1.05rem)',
                     height: 'calc(100vh - 8.75rem)'
                     }}>
                 <Suspense fallback={<div>Loading...</div>}>
@@ -182,11 +183,10 @@ export default function FolderView({folders}:{folders: Promise<FilearchFolder[] 
             </div>
         </div>
         <div 
-            className='position-absolute overflow-y-scroll' 
+            className='position-absolute overflow-y-noscroll' 
             style={{
-                width: 'calc(75vw - 2rem)',
+                width: '75vw',
                 height: 'calc(100vh - 7.75rem)',
-                margin: '1rem',
                 left: '25vw'
                 }}>
             <Suspense fallback={<div>Loading...</div>}>
