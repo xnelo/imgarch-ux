@@ -1,5 +1,6 @@
-import { ActionResponse, FilearchAPI_IdObject, PaginationContract, ResourceType, SortDirection, StorageType } from "./FilearchAPI";
-import { logActionResponseErrors, SinglePaginatedCall } from "./FilearchAPI_ServerFunctions";
+import logger from "@/lib/logger";
+import { ActionResponse, ActionType, FilearchAPI_IdObject, PaginationContract, ResourceType, SortDirection, StorageType } from "./FilearchAPI";
+import { logActionResponseErrors, MakeAPICall, SinglePaginatedCall } from "./FilearchAPI_ServerFunctions";
 
 export interface FilearchFile extends FilearchAPI_IdObject {
   owner_id: number;
@@ -27,4 +28,41 @@ export async function GetPaginatedFiles(
     return null;
   }
   return data.data;
+}
+
+export async function GetFileDownload(fileId: number, accessToken: string): Promise<Uint8Array<ArrayBuffer> | null> {
+  const response = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/download",
+    {
+      method: 'GET',
+      headers: {
+        'accept': 'application/octet-stream',
+        'Authorization': 'Bearer ' + accessToken
+      }
+    });
+  if (response.status == 200) {
+    const data : ArrayBuffer = await response.arrayBuffer();
+    return new Uint8Array<ArrayBuffer>(data);
+  } else {
+    logger.error("Error downloading file: status=" + response.status);
+    return null;
+  }
+}
+
+export async function GetThumbnailDownload(fileId: number, accessToken: string): Promise<Uint8Array<ArrayBuffer>|null> {
+  const response = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/download_thumbnail",
+    {
+      method: 'GET',
+      headers: {
+        'accept': 'application/octet-stream',
+        'Authorization': 'Bearer ' + accessToken
+      }
+    });
+  if (response.status == 200) {
+    const data : ArrayBuffer = await response.arrayBuffer();
+    return new Uint8Array<ArrayBuffer>(data);
+  } else {
+    const errMsg = await response.text();
+    logger.error("Error downloading file thumbnail: status=" + response.status + " msg=" + errMsg);
+    return null;
+  }
 }
