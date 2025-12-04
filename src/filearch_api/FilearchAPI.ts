@@ -14,6 +14,12 @@ export enum ActionType {
   DOWNLOAD
 }
 
+export enum StorageType {
+  UNKNOWN,
+  LOCAL_FILE_SYSTEM,
+  S3
+}
+
 export enum SortDirection {
   ASCENDING = "ASCENDING",
   DESCENDING = "DESCENDING"
@@ -24,7 +30,7 @@ export interface FilearchAPI_IdObject{
 }
 
 export interface PaginationContract<T> {
-  data: T | null;
+  data: T[] | null;
   has_next: boolean;
 }
 
