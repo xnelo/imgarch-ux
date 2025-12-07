@@ -1,5 +1,5 @@
 import logger from "@/lib/logger";
-import { ActionResponse, ActionType, FilearchAPI_IdObject, PaginationContract, ResourceType, SortDirection, StorageType } from "./FilearchAPI";
+import { ActionResponse, ActionType, FilearchAPI_IdObject, FilearchAPIResponse, PaginationContract, ResourceType, SortDirection, StorageType } from "./FilearchAPI";
 import { logActionResponseErrors, MakeAPICall, SinglePaginatedCall } from "./FilearchAPI_ServerFunctions";
 
 export interface FilearchFile extends FilearchAPI_IdObject {
@@ -64,5 +64,29 @@ export async function GetThumbnailDownload(fileId: number, accessToken: string):
     const errMsg = await response.text();
     logger.error("Error downloading file thumbnail: status=" + response.status + " msg=" + errMsg);
     return null;
+  }
+}
+
+export async function UploadFile(formData: FormData, accessToken: string) : Promise<FilearchAPIResponse<FilearchFile> | null> {
+  const response = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file",
+    {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'Authorization': 'Bearer ' + accessToken
+      },
+      body: formData
+    });
+  if (response.status == 200) {
+    const data = await response.json();
+    return data;
+  } else { 
+    try {
+      const errorData = await response.json();
+      return errorData;
+    } catch (e) {
+      logger.error("Getting error data: " + e);
+      return null;
+    }
   }
 }
