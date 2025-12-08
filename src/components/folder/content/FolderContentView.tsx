@@ -12,6 +12,20 @@ import { ActionResponse, ErrorResponse, FilearchAPIResponse } from "@/filearch_a
 import { FilearchFile } from "@/filearch_api/files";
 import toast from "react-hot-toast";
 
+function removeFile(currData: FileItem[], deletedId:number) : FileItem[] {
+  const newArray:FileItem[] = [];
+
+  for(const item of currData) {
+    if (item.id === deletedId) {
+      continue;
+    } else {
+      newArray.push(item);
+    }
+  }
+
+  return newArray;
+}
+
 export default function FolderContentView({selectedFolderItem}:{selectedFolderItem:FolderItem | undefined}) {
     
     const [data,setData] = useState<FileItem[]>([]);
@@ -100,6 +114,9 @@ export default function FolderContentView({selectedFolderItem}:{selectedFolderIt
       }
     }, [inView]);
     
+    function deleteFolderEventComplete(deletedId: number):void {
+      setData(prevData=> removeFile(prevData, deletedId))
+    }
 
     return (
       <div>
@@ -123,7 +140,7 @@ export default function FolderContentView({selectedFolderItem}:{selectedFolderIt
             <h3>NO DATA</h3>
           </div> : 
           <div className="row" style={{width:'calc(75vw - 1.0rem'}}>
-            {data.map(file => <FileItemView key={file.id} fileData={file}/>)}
+            {data.map(file => <FileItemView key={file.id} fileData={file} deleteEventCompleteCallback={deleteFolderEventComplete}/>)}
             {moreToLoad &&
             <div className="text-center" ref={ref}>
               Loading...

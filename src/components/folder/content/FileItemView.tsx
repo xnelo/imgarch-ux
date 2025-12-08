@@ -4,8 +4,13 @@ import { FileItem } from "./FileItem";
 import { useEffect, useState } from "react";
 import { DownloadThumbnail } from "./actions/DownloadImage";
 import styles from "./FolderContent.module.css"
+import { Button } from "react-bootstrap";
+import { DeleteFileAction } from "./actions/DeleteFile";
+import { FilearchFile } from "@/filearch_api/files";
+import { ActionResponse, ErrorResponse } from "@/filearch_api/FilearchAPI";
+import toast from "react-hot-toast";
 
-export default function FileItemView({fileData} : {fileData: FileItem}) {
+export default function FileItemView({fileData, deleteEventCompleteCallback} : {fileData: FileItem, deleteEventCompleteCallback:(deletedId:number) => void}) {
   const [isLoading, setIsLoading] = useState(true);
   const [imgUrl, setImgUrl] = useState<string|null>(null);
   
@@ -24,6 +29,23 @@ export default function FileItemView({fileData} : {fileData: FileItem}) {
   useEffect(()=>{
     getImageToDisplay();
   }, []);
+
+  const deleteItem = async () => {
+    const deleted: ActionResponse<FilearchFile> | null = await DeleteFileAction(fileData.id);
+    if (deleted === null) {
+      toast.error("Error deleting item. Please contact support. FileId=" + fileData.id);
+    } else {
+      if (deleted.errors !== null && deleted.errors.length > 0) {
+        for (let i = 0; i < deleted.errors.length; ++i) {
+          const error: ErrorResponse = deleted.errors[i];
+          toast.error("Error deleting item '" + error.error_message + "' (" + error.error_code + ")");
+        }
+      } else {
+        toast.success("File deleted successfully: " + deleted.data?.original_filename);
+        deleteEventCompleteCallback(fileData.id);
+      }
+    }
+  };
 
   return (
     <div className="text-white bg-primary m-2" style={{ width: '18rem', height: '18rem' }}>
@@ -53,6 +75,11 @@ export default function FileItemView({fileData} : {fileData: FileItem}) {
       <div className="text-center" style={{marginTop:'1rem'}}>
         {fileData.id}<br/>
         {fileData.originalFilename}
+      </div>
+      <div>
+        <Button className={styles.fileitem_deletebutton} onClick={deleteItem}>
+          <i className="bi bi-trash3" style={{fontSize:'0.75rem'}}></i>
+        </Button>
       </div>
     </div>
   );
