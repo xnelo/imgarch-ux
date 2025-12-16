@@ -90,3 +90,26 @@ export async function UploadFile(formData: FormData, accessToken: string) : Prom
     }
   }
 }
+
+export async function DeleteFile(fileId: number, accessToken: string) : Promise<ActionResponse<FilearchFile> | null> {
+  const response = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId, 
+    {
+      method: 'DELETE',
+      headers: {
+        'accept': 'application/json',
+        'Authorization': 'Bearer ' + accessToken
+      }
+    });
+  if (response.status == 200) {
+    const data : FilearchAPIResponse<FilearchFile> = await response.json();
+    return data.action_responses[0];
+  } else {
+    try {
+      const errorData : FilearchAPIResponse<FilearchFile> = await response.json();
+      return errorData.action_responses[0];
+    } catch(e) {
+      logger.error("Error Deleting file: " + e);
+      return null;
+    }
+  }
+}
