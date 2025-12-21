@@ -10,10 +10,10 @@ import { FilearchFile } from "@/filearch_api/files";
 import { ActionResponse, ErrorResponse } from "@/filearch_api/FilearchAPI";
 import toast from "react-hot-toast";
 
-export default function FileItemView({fileData, deleteEventCompleteCallback} : {fileData: FileItem, deleteEventCompleteCallback:(deletedId:number) => void}) {
+export default function FileItemView({ fileData, deleteEventCompleteCallback }: { fileData: FileItem, deleteEventCompleteCallback: (deletedId: number) => void }) {
   const [isLoading, setIsLoading] = useState(true);
-  const [imgUrl, setImgUrl] = useState<string|null>(null);
-  
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
+
   const getImageToDisplay = async () => {
     const rawImageData = await DownloadThumbnail(fileData.id);
     if (rawImageData === null) {
@@ -26,7 +26,7 @@ export default function FileItemView({fileData, deleteEventCompleteCallback} : {
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     getImageToDisplay();
   }, []);
 
@@ -47,39 +47,46 @@ export default function FileItemView({fileData, deleteEventCompleteCallback} : {
     }
   };
 
+  function tst() {
+    alert("DOPOD");
+  }
+
   return (
-    <div className="text-white bg-primary m-2" style={{ width: '18rem', height: '18rem' }}>
-      <div className="text-center">
-        {isLoading ? 
-            <div style={{marginTop:'2rem', marginBottom:'3.33rem'}}>
+    <div className="text-white bg-primary m-2" style={{ width: '18rem', paddingLeft: "0px", paddingRight: "0px" }}>
+      <div style={{width:"0px", height:"0px"}} >
+        <Button className={styles.fileitem_deletebutton} onClick={deleteItem}>
+          <i className="bi bi-trash3" style={{ fontSize: '0.75rem' }}></i>
+        </Button>
+      </div>
+      <div onClick={tst}>
+        <div className="text-center">
+          {isLoading ?
+            <div style={{ marginTop: '2rem', marginBottom: '3.33rem' }}>
               <div>
-              <img className={styles.rotate_image} src="/loading.png" width={100} height={100}/>
+                <img className={styles.rotate_image} src="/loading.png" width={100} height={100} />
               </div>
               <div>
-              Loading...
+                Loading...
               </div>
             </div> :
-            (imgUrl === null ? 
-              <div style={{position:'relative'}}>
-                <i className="bi bi-image" style={{fontSize:"8em"}}></i> 
+            (imgUrl === null ?
+              <div>
+                <i className="bi bi-image" style={{ fontSize: "8em" }}></i>
                 <i className="bi bi-x-circle-fill text-danger" style={
-                  {fontSize:"4em",
-                    position:"absolute",
-                    top:"40%",
-                    left:"52%"
+                  {
+                    fontSize: "4em",
+                    position: "relative",
+                    top: "40%",
+                    left: "-1rem"
                   }}></i>
-              </div>: 
-            <img src={imgUrl} height={125} style={{marginTop:'2.0rem', marginBottom:'2.1875rem'}}/>)
+              </div> :
+              <img src={imgUrl} height={125} style={{ marginTop: '2.0rem', marginBottom: '2.1875rem' }} />)
           }
-      </div>
-      <div className="text-center" style={{marginTop:'1rem'}}>
-        {fileData.id}<br/>
-        {fileData.originalFilename}
-      </div>
-      <div>
-        <Button className={styles.fileitem_deletebutton} onClick={deleteItem}>
-          <i className="bi bi-trash3" style={{fontSize:'0.75rem'}}></i>
-        </Button>
+        </div>
+        <div className="text-center" style={{ marginTop: '1rem', paddingBottom: '1rem', overflowWrap:"anywhere"}}>
+          {fileData.id}<br />
+          {fileData.originalFilename}
+        </div>
       </div>
     </div>
   );
