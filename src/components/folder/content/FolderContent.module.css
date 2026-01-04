@@ -21,14 +21,38 @@
   border-radius:20px;
   width:34px;
   padding: 5px 0px;
-  /*
-  top:1rem;
-  left:1rem;*/
+  top:0.25rem;
+  left:15.66rem;
   background:none;
+  z-index: 9999;
 }
 
 .fileitem_deletebutton:hover {
   background: fixed;
   background-color: var(--bs-secondary);
   color: var(--bs-primary);
+}
+
+.fileitem_missingimagepos{
+  position: relative;
+  width: 75%;
+  left: 3.95rem;
+}
+
+.fileitem_missingimageX {
+  font-size: 4em;
+  position: relative;
+  top: 40%;
+  left: -3rem;
+}
+
+.fileitem_image {
+  margin-top: 2.0rem; 
+  margin-bottom: 2.1875rem;
+}
+
+.fileitem_text {
+  margin-top: 1rem; 
+  padding-bottom: 1rem; 
+  overflow-wrap: anywhere;
 }

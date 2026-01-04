@@ -70,20 +70,14 @@ export default function FileItemView({ fileData, deleteEventCompleteCallback }: 
               </div>
             </div> :
             (imgUrl === null ?
-              <div>
+              <div className={styles.fileitem_missingimagepos}>
                 <i className="bi bi-image" style={{ fontSize: "8em" }}></i>
-                <i className="bi bi-x-circle-fill text-danger" style={
-                  {
-                    fontSize: "4em",
-                    position: "relative",
-                    top: "40%",
-                    left: "-1rem"
-                  }}></i>
+                <i className={`bi bi-x-circle-fill text-danger ${styles.fileitem_missingimageX}`}></i>
               </div> :
-              <img src={imgUrl} height={125} style={{ marginTop: '2.0rem', marginBottom: '2.1875rem' }} />)
+              <img src={imgUrl} height={125} className={styles.fileitem_image} />)
           }
         </div>
-        <div className="text-center" style={{ marginTop: '1rem', paddingBottom: '1rem', overflowWrap:"anywhere"}}>
+        <div className={`text-center ${styles.fileitem_text}`}>
           {fileData.id}<br />
           {fileData.originalFilename}
         </div>
