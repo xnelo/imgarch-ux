@@ -11,6 +11,7 @@ import { UploadImage } from "./actions/UploadFiles";
 import { ActionResponse, ErrorResponse, FilearchAPIResponse } from "@/filearch_api/FilearchAPI";
 import { FilearchFile } from "@/filearch_api/files";
 import toast from "react-hot-toast";
+import FileViewer from "./FileViewer";
 
 function removeFile(currData: FileItem[], deletedId:number) : FileItem[] {
   const newArray:FileItem[] = [];
@@ -118,7 +119,22 @@ export default function FolderContentView({selectedFolderItem}:{selectedFolderIt
       setData(prevData=> removeFile(prevData, deletedId))
     }
 
+    const [show, setShow] = useState(false);
+    const [shownFileItem, setShownFileItem] = useState<FileItem|undefined>(undefined);
+    const handleShowSelectedImage = async (selectedImage: FileItem) => {
+      setShownFileItem(selectedImage);
+      setShow(true);
+    };
+    function handleCloseSelectedImage() {
+      setShow(false);
+    };
+
     return (
+      <>
+      <FileViewer 
+        show={show} 
+        fileItemToShow={shownFileItem}
+        onHideCallback={handleCloseSelectedImage}/>
       <div>
         <h2 style={{
           borderBottom: 'var(--bs-border-color) 1px solid',
@@ -140,7 +156,7 @@ export default function FolderContentView({selectedFolderItem}:{selectedFolderIt
             <h3>NO DATA</h3>
           </div> : 
           <div className="row" style={{width:'calc(75vw - 1.0rem'}}>
-            {data.map(file => <FileItemView key={file.id} fileData={file} deleteEventCompleteCallback={deleteFolderEventComplete}/>)}
+            {data.map(file => <FileItemView key={file.id} fileData={file} deleteEventCompleteCallback={deleteFolderEventComplete} showSelectedImageCallback={handleShowSelectedImage}/>)}
             {moreToLoad &&
             <div className="text-center" ref={ref}>
               Loading...
@@ -160,5 +176,6 @@ export default function FolderContentView({selectedFolderItem}:{selectedFolderIt
           paddingTop: '.5rem'}}>
         </div>
       </div>
+      </>
     );
 }

@@ -10,7 +10,7 @@ import { FilearchFile } from "@/filearch_api/files";
 import { ActionResponse, ErrorResponse } from "@/filearch_api/FilearchAPI";
 import toast from "react-hot-toast";
 
-export default function FileItemView({ fileData, deleteEventCompleteCallback }: { fileData: FileItem, deleteEventCompleteCallback: (deletedId: number) => void }) {
+export default function FileItemView({ fileData, deleteEventCompleteCallback, showSelectedImageCallback }: { fileData: FileItem, deleteEventCompleteCallback: (deletedId: number) => void, showSelectedImageCallback: (selectedImage: FileItem) => void}) {
   const [isLoading, setIsLoading] = useState(true);
   const [imgUrl, setImgUrl] = useState<string | null>(null);
 
@@ -47,8 +47,8 @@ export default function FileItemView({ fileData, deleteEventCompleteCallback }: 
     }
   };
 
-  function tst() {
-    alert("DOPOD");
+  function imageSelected() {
+    showSelectedImageCallback(fileData);
   }
 
   return (
@@ -58,7 +58,7 @@ export default function FileItemView({ fileData, deleteEventCompleteCallback }: 
           <i className="bi bi-trash3" style={{ fontSize: '0.75rem' }}></i>
         </Button>
       </div>
-      <div onClick={tst}>
+      <div onClick={imageSelected}>
         <div className="text-center">
           {isLoading ?
             <div style={{ marginTop: '2rem', marginBottom: '3.33rem' }}>
