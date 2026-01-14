@@ -7,7 +7,8 @@ export interface FilearchFile extends FilearchAPI_IdObject {
   folder_id: number;
   storage_type: StorageType;
   storage_key: string;
-  original_filename: string
+  original_filename: string;
+  mime_type: string;
 }
 
 export async function GetPaginatedFiles(

@@ -92,7 +92,8 @@ export default function FolderContentView({selectedFolderItem}:{selectedFolderIt
             folderId: z.folder_id,
             storageType: z.storage_type,
             storageKey: z.storage_key,
-            originalFilename: z.original_filename
+            originalFilename: z.original_filename,
+            mimeType: z.mime_type
           }));
           setLastListItemId(mappedResults[mappedResults.length - 1].id);
           if (isInitialCall) {
