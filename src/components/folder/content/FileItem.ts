@@ -5,6 +5,7 @@ export interface FileItem {
   ownerId: number;
   folderId: number;
   storageType: StorageType;
-  storageKey: String;
-  originalFilename: String;
+  storageKey: string;
+  originalFilename: string;
+  mimeType: string;
 }
