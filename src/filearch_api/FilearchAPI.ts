@@ -2,7 +2,8 @@ export enum ResourceType {
   USER,
   FILE,
   FOLDER,
-  USERNAME
+  USERNAME,
+  TAG
 }
 
 export enum ActionType {

@@ -1,5 +1,5 @@
 import logger from "@/lib/logger";
-import { ActionResponse, ActionType, ErrorResponse, FilearchAPIResponse, PaginationContract, ResourceType, SortDirection } from "./FilearchAPI";
+import { ActionResponse, ActionType, ErrorResponse, FilearchAPI_IdObject, FilearchAPIResponse, PaginationContract, ResourceType, SortDirection } from "./FilearchAPI";
 
 export function logActionResponseErrors<T>(actionResponse: ActionResponse<T>):void {
   actionResponse.errors!.forEach((error:ErrorResponse)=>
@@ -8,6 +8,42 @@ export function logActionResponseErrors<T>(actionResponse: ActionResponse<T>):vo
         " error_code=" + error.error_code + 
         " http_code=" + error.http_code);
     });
+}
+
+export async function GetAllPaginatedData<T extends FilearchAPI_IdObject>(accessToken:string, url:string, sortDirection:SortDirection, limit:number, resourceType: ResourceType): Promise<T[] | null> {
+  let outputData: T[] = [];
+  let hasMoreData : boolean = true;
+  let after : number | null = null;
+  while(hasMoreData) {
+    const paginationCall: ActionResponse<PaginationContract<T>> | null = 
+      await SinglePaginatedCall(accessToken, url, after, sortDirection, limit, resourceType);
+
+    if (paginationCall === null) {
+      logger.error("Error during a pagination call; URL=" + url);
+      return null;
+    }
+
+    // append data array to output array
+    if (paginationCall.data === null || paginationCall.data.data === null) {
+      logger.error("The returned data from pagination call was null");
+      return null;
+    } else if (paginationCall.errors !== null) {
+      logActionResponseErrors(paginationCall);
+      return null;
+    } else if (!Array.isArray(paginationCall.data.data)) {
+      logger.error("The returned data from pagination call was not an array.");
+      return null;
+    } else { 
+      paginationCall.data.data.forEach((dataItem:T) => {
+        after = dataItem.id;
+        outputData.push(dataItem);
+      });
+    }
+
+    hasMoreData = paginationCall.data.has_next;
+  }
+
+  return outputData;
 }
 
 export async function SinglePaginatedCall<T>(

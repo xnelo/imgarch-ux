@@ -6,6 +6,13 @@ import { FileItem } from './FileItem';
 import styles from "./FolderContent.module.css"
 import { DownloadImage } from './actions/DownloadImage';
 import { Button, Form } from 'react-bootstrap';
+import { GetTagsForFile } from './actions/Tags';
+import { FilearchTag } from '@/filearch_api/tag';
+
+interface TagItem {
+  id: number;
+  tagName: string;
+}
 
 const DEFAULT_IMAGE_ZOOM : number = 100;
 const MIN_IMAGE_ZOOM : number = 25;
@@ -13,14 +20,30 @@ const MAX_IMAGE_ZOOM : number = 400;
 const IMAGE_ZOOM_STEP : number  = 5;
 
 export default function FileViewer({ show, fileItemToShow, onHideCallback }: { show: boolean, fileItemToShow: FileItem | undefined, onHideCallback: () => void }) {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const [imgZoom, setImgZoom] = useState<number>(DEFAULT_IMAGE_ZOOM);
+  const [imgTags, setImgTags] = useState<TagItem[] | null>(null);
 
   const handleOnShow = async() => {
     setImgUrl(null);
     getImageToDisplay();
     handleResetImageZoom();
+    getImageTags();
+  }
+
+  const getImageTags = async () => {
+    setImgTags(null);
+    if (fileItemToShow !== undefined) {
+      const tagsArray = await GetTagsForFile(fileItemToShow.id);
+      if (tagsArray !== null) {
+        let finalTags : TagItem[] = [];
+        tagsArray.forEach((filearchTag:FilearchTag) => {
+          finalTags.push({id:filearchTag.id, tagName:filearchTag.tag_name});
+        });
+        setImgTags(finalTags);
+      }
+    }
   }
 
   const getImageToDisplay = async () => {
@@ -101,6 +124,15 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback }: { s
             <Button onClick={handleZoomOut}><i className="bi bi-zoom-out"></i></Button>
             <Button onClick={handleResetImageZoom}><i className="bi bi-arrow-counterclockwise"></i></Button>
             <Form.Range min={MIN_IMAGE_ZOOM} step={IMAGE_ZOOM_STEP} max={MAX_IMAGE_ZOOM} value={imgZoom} onChange={handleZoomeRangeInput} id='zoomRange'/>
+            <div style={{backgroundColor:'red'}}>
+              <div className='text-bg-light'>Tags</div>
+              <div>
+                {(imgTags === null || imgTags.length <= 0) ? 
+                  <span>NO TAGS</span> : 
+                  imgTags.map(tag=><span key={tag.id} className='badge rounded-pill text-bg-primary me-2'>{tag.tagName}</span>)
+                }
+              </div>
+            </div>
           </div>
         </div>
       </Modal.Body>
