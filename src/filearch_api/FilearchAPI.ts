@@ -12,7 +12,9 @@ export enum ActionType {
   UPDATE,
   GET,
   DELETE,
-  DOWNLOAD
+  DOWNLOAD,
+  SEARCH,
+  ASSIGN
 }
 
 export enum StorageType {

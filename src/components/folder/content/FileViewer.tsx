@@ -8,6 +8,7 @@ import { DownloadImage } from './actions/DownloadImage';
 import { Button, Form } from 'react-bootstrap';
 import { GetTagsForFile } from './actions/Tags';
 import { FilearchTag } from '@/filearch_api/tag';
+import TagSearch from '../utils/TagSearch';
 
 interface TagItem {
   id: number;
@@ -86,7 +87,7 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback }: { s
   }
 
   return (
-    <Modal show={show} fullscreen={true} onShow={handleOnShow} onHide={onHideCallback} style={{zIndex:99999}}>
+    <Modal show={show} fullscreen={true} onShow={handleOnShow} onHide={onHideCallback} style={{zIndex:9999}}>
       <Modal.Header closeButton>
         <Modal.Title>{fileItemToShow?.originalFilename}</Modal.Title>
       </Modal.Header>
@@ -126,6 +127,7 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback }: { s
             <Form.Range min={MIN_IMAGE_ZOOM} step={IMAGE_ZOOM_STEP} max={MAX_IMAGE_ZOOM} value={imgZoom} onChange={handleZoomeRangeInput} id='zoomRange'/>
             <div style={{backgroundColor:'red'}}>
               <div className='text-bg-light'>Tags</div>
+              <TagSearch fileId={fileItemToShow?.id} />
               <div>
                 {(imgTags === null || imgTags.length <= 0) ? 
                   <span>NO TAGS</span> : 
