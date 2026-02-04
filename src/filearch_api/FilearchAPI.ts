@@ -14,7 +14,8 @@ export enum ActionType {
   DELETE,
   DOWNLOAD,
   SEARCH,
-  ASSIGN
+  ASSIGN,
+  UNASSIGN
 }
 
 export enum StorageType {

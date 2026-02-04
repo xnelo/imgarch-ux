@@ -1,6 +1,11 @@
 'use server'
 
-import { SearchTags as APISearchTags, AddNewTag as APIAddNewTag, AddTagToFile as APIAddTagToFile } from "@/filearch_api/tag";
+import {
+  SearchTags as APISearchTags,
+  AddNewTag as APIAddNewTag,
+  AddTagToFile as APIAddTagToFile,
+  RemoveTagFromFile as APIRemoveTagFromFile
+} from "@/filearch_api/tag";
 import { getSession } from "@/lib/lib";
 import logger from "@/lib/logger";
 
@@ -32,4 +37,14 @@ export async function AddTagToFile(tagId: number, fileId: number) {
     return false;
   }
   return await APIAddTagToFile(session.access_token, tagId, fileId);
+}
+
+export async function RemoveTagFromFile(tagId: number, fileId: number) {
+  logger.debug("Removing tag from file: tagId=" + tagId + ", fileId=" + fileId);
+  const session = await getSession();
+  if (session.access_token === undefined) {
+    logger.error("Access token is 'undefined'. Cannot call API.");
+    return false;
+  }
+  return await APIRemoveTagFromFile(session.access_token, tagId, fileId);
 }

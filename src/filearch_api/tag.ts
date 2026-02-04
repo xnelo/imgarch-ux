@@ -105,7 +105,40 @@ export async function AddTagToFile(accessToken:string, tagId: number, fileId: nu
     logger.error("Response data NULL url=" + finalUrl);
     return false;
   } else {
-    return true;
+    return response[0].data;
+  }
+}
+
+export async function RemoveTagFromFile(accessToken:string, tagId: number, fileId: number): Promise<boolean> {
+  const finalUrl: string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/unassign_tag";
+  const removeTagData = {
+    tag_id: tagId
+  };
+
+  const initParams:RequestInit = {
+    method: 'POST',
+    headers: {
+      'accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + accessToken
+    },
+    body: JSON.stringify(removeTagData)
+  };
+
+  const response:ActionResponse<boolean>[] = await MakeAPICall<boolean>(finalUrl, initParams, ResourceType.TAG, ActionType.UNASSIGN);
+  
+  if (response[0].errors !== null && response[0].errors.length > 0) {
+    // Log errors and return false
+    logger.error("Response contains errors.");
+    logActionResponseErrors(response[0]);
+    return false;
+  } else if (response[0].data === null) {
+    // this should not happen
+    // log error and return false
+    logger.error("Response data NULL url=" + finalUrl);
+    return false;
+  } else {
+    return response[0].data;
   }
 }
 

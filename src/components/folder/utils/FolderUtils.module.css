@@ -1,0 +1,14 @@
+.folderView_tag {
+  position: relative;
+}
+
+.folderView_tag > a {
+  margin-left: 5px;
+  color: var(--bs-gray-600) !important;
+  display: inline-block;
+}
+
+.folderView_tag:hover > a:hover {
+  color: var(--bs-secondary) !important;
+  cursor: pointer;
+}

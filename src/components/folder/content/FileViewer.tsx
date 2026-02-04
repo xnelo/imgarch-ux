@@ -9,11 +9,7 @@ import { Button, Form } from 'react-bootstrap';
 import { GetTagsForFile } from './actions/Tags';
 import { FilearchTag } from '@/filearch_api/tag';
 import TagSearch from '../utils/TagSearch';
-
-interface TagItem {
-  id: number;
-  tagName: string;
-}
+import TagViewItem, { TagItem } from '../utils/TagViewItem';
 
 const DEFAULT_IMAGE_ZOOM : number = 100;
 const MIN_IMAGE_ZOOM : number = 25;
@@ -95,6 +91,13 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback }: { s
     }
   }
 
+  function tagRemovedFromFile(tagId: number) {
+    if (imgTags !== null) {
+      const newTagItems = imgTags.filter(tag=>tag.id !== tagId);
+      setImgTags(newTagItems);
+    }
+  }
+
   return (
     <Modal show={show} fullscreen={true} onShow={handleOnShow} onHide={onHideCallback} style={{zIndex:9999}}>
       <Modal.Header closeButton>
@@ -140,7 +143,7 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback }: { s
               <div>
                 {(imgTags === null || imgTags.length <= 0) ? 
                   <span>NO TAGS</span> : 
-                  imgTags.map(tag=><span key={tag.id} className='badge rounded-pill text-bg-primary me-2'>{tag.tagName}</span>)
+                  imgTags.map(tag=><TagViewItem key={tag.id} tagItem={tag} fileOn={fileItemToShow?.id} tagRemovedCallback={tagRemovedFromFile}/>)
                 }
               </div>
             </div>
