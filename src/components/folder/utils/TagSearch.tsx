@@ -1,13 +1,13 @@
-import { FocusEventHandler, FormEvent, useRef, useState } from "react";
+import { FormEvent, useState } from "react";
 import { AddNewTag, AddTagToFile, SearchTags } from "./actions/TagActions";
 import { FilearchTag } from "@/filearch_api/tag";
 import toast from "react-hot-toast";
 
-export default function TagSearch({fileId}: {fileId: number | undefined}) {
+export default function TagSearch({fileId, tagAddedCallback}: {fileId: number | undefined, tagAddedCallback: (tag: FilearchTag) => void}) {
   const [isAddTagEnabled, setIsAddTagEnabled] = useState(false);
   const [tagsInList, setTagsInList] = useState<FilearchTag[]>([]);
   const [currentInputTag, setCurrentInputTag] = useState<string>('');
-  const [selectedTagId, setSelectedTagId] = useState<number|null>(null);
+  const [selectedTag, setSelectedTag] = useState<FilearchTag | null>(null);
 
   async function searchTagChanged(event : FormEvent<HTMLInputElement>) {
     const currentInput = event.currentTarget.value;
@@ -18,9 +18,9 @@ export default function TagSearch({fileId}: {fileId: number | undefined}) {
       setIsAddTagEnabled(false);
     } else {
       setIsAddTagEnabled(true);
-      const currentSelectedOptionId : number | null = getCurrentOptionInDataList(currentInput);
-      setSelectedTagId(currentSelectedOptionId);
-      if (currentSelectedOptionId === null) {
+      const currentSelectedOption : FilearchTag | null = getCurrentOptionInDataList(currentInput);
+      setSelectedTag(currentSelectedOption);
+      if (currentSelectedOption === null) {
         const foundTags: FilearchTag[] | null = await SearchTags(currentInput);
         if (foundTags === null) {
           setTagsInList([]);
@@ -31,10 +31,10 @@ export default function TagSearch({fileId}: {fileId: number | undefined}) {
     }
   }
 
-  function getCurrentOptionInDataList(inputValue :string) : number | null {
+  function getCurrentOptionInDataList(inputValue :string) : FilearchTag | null {
     for (const tag of tagsInList) {
       if (tag.tag_name === inputValue) {
-        return tag.id;
+        return tag;
       }
     }
     return null;
@@ -46,32 +46,37 @@ export default function TagSearch({fileId}: {fileId: number | undefined}) {
       return;
     }
 
-    let tagIdToUse : number = -1;
+    let tagToUse : FilearchTag | null = null;
 
-    if (selectedTagId === null) { 
-      alert("Adding new tag to system: " + currentInputTag);
+    if (selectedTag === null) { 
+      // need to add new tag
       const newTag = await AddNewTag(currentInputTag);
       if (newTag === null) {
         toast.error("Error adding new tag. Please contact support.");
         setCurrentInputTag('');
         setIsAddTagEnabled(false);
         return;
+      } else {
+        toast.success("New tag added " + currentInputTag + " to system.");
       }
       setTagsInList(prev => [...prev, newTag]);
-      setSelectedTagId(newTag.id);
-      tagIdToUse = newTag.id;
+      setSelectedTag(newTag);
+      tagToUse = newTag;
     } else {
-      tagIdToUse = selectedTagId;
+      // use the currently selected tag
+      tagToUse = selectedTag;
     }
     
-    alert("Adding tag: " + currentInputTag + " (" + tagIdToUse + ") to file id: " + fileId);
-    const addTagResult = await AddTagToFile(tagIdToUse, fileId);
+    // now add the tag to the file
+    const addTagResult = await AddTagToFile(tagToUse.id, fileId);
     if (!addTagResult) {
       toast.error("Error adding tag to file. Please contact support.");
       return;
     } else {
       toast.success("Tag added to file.");
+      tagAddedCallback(tagToUse);
     }
+    // reset input and add button
     setCurrentInputTag('');
     setIsAddTagEnabled(false);
   }

@@ -86,6 +86,15 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback }: { s
     setImgZoom(Number.parseInt(ele.target.value));
   }
 
+  function tagAddedToFile(filearchTag: FilearchTag) {
+    const newTagItem : TagItem = {id: filearchTag.id, tagName: filearchTag.tag_name};
+    if (imgTags !== null) {
+      setImgTags([...imgTags, newTagItem]);
+    } else {
+      setImgTags([newTagItem]);
+    }
+  }
+
   return (
     <Modal show={show} fullscreen={true} onShow={handleOnShow} onHide={onHideCallback} style={{zIndex:9999}}>
       <Modal.Header closeButton>
@@ -127,7 +136,7 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback }: { s
             <Form.Range min={MIN_IMAGE_ZOOM} step={IMAGE_ZOOM_STEP} max={MAX_IMAGE_ZOOM} value={imgZoom} onChange={handleZoomeRangeInput} id='zoomRange'/>
             <div style={{backgroundColor:'red'}}>
               <div className='text-bg-light'>Tags</div>
-              <TagSearch fileId={fileItemToShow?.id} />
+              <TagSearch fileId={fileItemToShow?.id} tagAddedCallback={tagAddedToFile}/>
               <div>
                 {(imgTags === null || imgTags.length <= 0) ? 
                   <span>NO TAGS</span> : 
