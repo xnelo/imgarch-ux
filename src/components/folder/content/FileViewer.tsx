@@ -5,16 +5,18 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { FileItem } from './FileItem';
 import styles from "./FolderContent.module.css"
 import { DownloadImage } from './actions/DownloadImage';
-import { Button, Form } from 'react-bootstrap';
+import { Accordion, Button, Form } from 'react-bootstrap';
 import { GetTagsForFile } from './actions/Tags';
 import { FilearchTag } from '@/filearch_api/tag';
 import TagSearch from '../utils/TagSearch';
 import TagViewItem, { TagItem } from '../utils/TagViewItem';
+import { AccordionEventKey } from 'react-bootstrap/esm/AccordionContext';
 
 const DEFAULT_IMAGE_ZOOM: number = 100;
 const MIN_IMAGE_ZOOM: number = 25;
 const MAX_IMAGE_ZOOM: number = 400;
 const IMAGE_ZOOM_STEP: number = 5;
+const LOCAL_STORAGE_KEY_TOOL_ACTIVE_KEY = "fileViewerAccordionActiveKey";
 
 export default function FileViewer({ show, fileItemToShow, onHideCallback }: { show: boolean, fileItemToShow: FileItem | undefined, onHideCallback: () => void }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -98,6 +100,21 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback }: { s
     }
   }
 
+  const [activAccordionKeys, setActiveAccordionKeys] = useState<AccordionEventKey>(null);
+
+  useEffect(() => {
+    // Load state from local storage on mount
+    const savedKey = localStorage.getItem(LOCAL_STORAGE_KEY_TOOL_ACTIVE_KEY);
+    if (savedKey) {
+      setActiveAccordionKeys(savedKey);
+    }
+  }, []);
+
+  function handleAccordionSelect(eventKey: AccordionEventKey | null) {
+    setActiveAccordionKeys(eventKey);
+    localStorage.setItem(LOCAL_STORAGE_KEY_TOOL_ACTIVE_KEY, eventKey === null || eventKey === undefined ? "" : eventKey.toString());
+  }
+
   return (
     <Modal show={show} fullscreen={true} onShow={handleOnShow} onHide={onHideCallback} style={{ zIndex: 9999 }}>
       <Modal.Header closeButton>
@@ -134,28 +151,37 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback }: { s
               left: '80vw',
               height: '91.4vh'
             }}>
-            <div>
-              <div>Zoom</div>
-              <div>
-                <Button onClick={handleZoomIn}><i className="bi bi-zoom-in"></i></Button>
-                <span>{imgZoom}%</span>
-                <Button onClick={handleZoomOut}><i className="bi bi-zoom-out"></i></Button>
-                <Button onClick={handleResetImageZoom}><i className="bi bi-arrow-counterclockwise"></i></Button>
-                <Form.Range min={MIN_IMAGE_ZOOM} step={IMAGE_ZOOM_STEP} max={MAX_IMAGE_ZOOM} value={imgZoom} onChange={handleZoomeRangeInput} id='zoomRange' />
-              </div>
-            </div>
-            <div>
-              <div className='text-bg-light mb-2'>Tags</div>
-              <div>
-                <TagSearch fileId={fileItemToShow?.id} tagAddedCallback={tagAddedToFile} />
-                <div className='mt-2'>
-                  {(imgTags === null || imgTags.length <= 0) ?
-                    <span>NO TAGS</span> :
-                    imgTags.map(tag => <TagViewItem key={tag.id} tagItem={tag} fileOn={fileItemToShow?.id} tagRemovedCallback={tagRemovedFromFile} />)
-                  }
-                </div>
-              </div>
-            </div>
+            <Accordion defaultActiveKey={activAccordionKeys} onSelect={handleAccordionSelect} alwaysOpen>
+              <Accordion.Item eventKey="0">
+                <Accordion.Header>Zoom</Accordion.Header>
+                <Accordion.Body>
+                  <Button onClick={handleZoomIn}><i className="bi bi-zoom-in"></i></Button>
+                  <span>{imgZoom}%</span>
+                  <Button onClick={handleZoomOut}><i className="bi bi-zoom-out"></i></Button>
+                  <Button onClick={handleResetImageZoom}><i className="bi bi-arrow-counterclockwise"></i></Button>
+                  <Form.Range min={MIN_IMAGE_ZOOM} step={IMAGE_ZOOM_STEP} max={MAX_IMAGE_ZOOM} value={imgZoom} onChange={handleZoomeRangeInput} id='zoomRange' />
+                </Accordion.Body>
+              </Accordion.Item>
+              <Accordion.Item eventKey="1">
+                <Accordion.Header>Tags</Accordion.Header>
+                <Accordion.Body>
+                  <TagSearch fileId={fileItemToShow?.id} tagAddedCallback={tagAddedToFile} />
+                  <div className='mt-2'>
+                    {(imgTags === null || imgTags.length <= 0) ?
+                      <span>NO TAGS</span> :
+                      imgTags.map(tag => <TagViewItem key={tag.id} tagItem={tag} fileOn={fileItemToShow?.id} tagRemovedCallback={tagRemovedFromFile} />)
+                    }
+                  </div>
+                </Accordion.Body>
+              </Accordion.Item>
+              <Accordion.Item eventKey="2">
+                <Accordion.Header>Metadata</Accordion.Header>
+                <Accordion.Body>
+                  <div><b>Original Filename:</b> {fileItemToShow?.originalFilename}</div>
+                  <div><b>Mime Type:</b> {fileItemToShow?.mimeType}</div>
+                </Accordion.Body>
+              </Accordion.Item>
+            </Accordion>
           </div>
         </div>
       </Modal.Body>
