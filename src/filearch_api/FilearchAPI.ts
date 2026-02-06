@@ -2,7 +2,8 @@ export enum ResourceType {
   USER,
   FILE,
   FOLDER,
-  USERNAME
+  USERNAME,
+  TAG
 }
 
 export enum ActionType {
@@ -11,7 +12,10 @@ export enum ActionType {
   UPDATE,
   GET,
   DELETE,
-  DOWNLOAD
+  DOWNLOAD,
+  SEARCH,
+  ASSIGN,
+  UNASSIGN
 }
 
 export enum StorageType {
