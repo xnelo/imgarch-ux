@@ -11,10 +11,10 @@ import { FilearchTag } from '@/filearch_api/tag';
 import TagSearch from '../utils/TagSearch';
 import TagViewItem, { TagItem } from '../utils/TagViewItem';
 
-const DEFAULT_IMAGE_ZOOM : number = 100;
-const MIN_IMAGE_ZOOM : number = 25;
-const MAX_IMAGE_ZOOM : number = 400;
-const IMAGE_ZOOM_STEP : number  = 5;
+const DEFAULT_IMAGE_ZOOM: number = 100;
+const MIN_IMAGE_ZOOM: number = 25;
+const MAX_IMAGE_ZOOM: number = 400;
+const IMAGE_ZOOM_STEP: number = 5;
 
 export default function FileViewer({ show, fileItemToShow, onHideCallback }: { show: boolean, fileItemToShow: FileItem | undefined, onHideCallback: () => void }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -22,7 +22,7 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback }: { s
   const [imgZoom, setImgZoom] = useState<number>(DEFAULT_IMAGE_ZOOM);
   const [imgTags, setImgTags] = useState<TagItem[] | null>(null);
 
-  const handleOnShow = async() => {
+  const handleOnShow = async () => {
     setImgUrl(null);
     getImageToDisplay();
     handleResetImageZoom();
@@ -34,9 +34,9 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback }: { s
     if (fileItemToShow !== undefined) {
       const tagsArray = await GetTagsForFile(fileItemToShow.id);
       if (tagsArray !== null) {
-        let finalTags : TagItem[] = [];
-        tagsArray.forEach((filearchTag:FilearchTag) => {
-          finalTags.push({id:filearchTag.id, tagName:filearchTag.tag_name});
+        let finalTags: TagItem[] = [];
+        tagsArray.forEach((filearchTag: FilearchTag) => {
+          finalTags.push({ id: filearchTag.id, tagName: filearchTag.tag_name });
         });
         setImgTags(finalTags);
       }
@@ -78,12 +78,12 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback }: { s
     setImgZoom(DEFAULT_IMAGE_ZOOM);
   }
 
-  function handleZoomeRangeInput(ele:ChangeEvent<HTMLInputElement>) {
+  function handleZoomeRangeInput(ele: ChangeEvent<HTMLInputElement>) {
     setImgZoom(Number.parseInt(ele.target.value));
   }
 
   function tagAddedToFile(filearchTag: FilearchTag) {
-    const newTagItem : TagItem = {id: filearchTag.id, tagName: filearchTag.tag_name};
+    const newTagItem: TagItem = { id: filearchTag.id, tagName: filearchTag.tag_name };
     if (imgTags !== null) {
       setImgTags([...imgTags, newTagItem]);
     } else {
@@ -93,58 +93,67 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback }: { s
 
   function tagRemovedFromFile(tagId: number) {
     if (imgTags !== null) {
-      const newTagItems = imgTags.filter(tag=>tag.id !== tagId);
+      const newTagItems = imgTags.filter(tag => tag.id !== tagId);
       setImgTags(newTagItems);
     }
   }
 
   return (
-    <Modal show={show} fullscreen={true} onShow={handleOnShow} onHide={onHideCallback} style={{zIndex:9999}}>
+    <Modal show={show} fullscreen={true} onShow={handleOnShow} onHide={onHideCallback} style={{ zIndex: 9999 }}>
       <Modal.Header closeButton>
         <Modal.Title>{fileItemToShow?.originalFilename}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className='container-fluid'>
-        {isLoading ?
-          <div className='position-absolute top-50 start-50 translate-middle'>
-            <div>
-              <img className={styles.rotate_image} src="/loading.png" width={100} height={100} style={{filter:'invert(1) opacity(0.333)'}}/>
-            </div>
-            <div style={{textAlign:'center'}}>
-              Loading...
-            </div>
-          </div> :
-          (imgUrl === null ? 
-            <div>NO IMAGE</div> :
-            <div className='position-absolute' 
-                  style={{
-                    left: '0px', 
-                    padding: '1rem', 
-                    width:'80vw', 
-                    height: '91.4vh', 
-                    overflow:'scroll'}}>
-              <img src={imgUrl} style={{width: `${imgZoom}%`}}/>
-            </div>
-          )}
-          <div className='position-absolute border-start border-1' 
-                style={{ 
-                  width:'20vw', 
-                  padding: '1rem', 
-                  left:'80vw', 
-                  height: '91.4vh'}}>
-            <Button onClick={handleZoomIn}><i className="bi bi-zoom-in"></i></Button>
-            <span>{imgZoom}%</span>
-            <Button onClick={handleZoomOut}><i className="bi bi-zoom-out"></i></Button>
-            <Button onClick={handleResetImageZoom}><i className="bi bi-arrow-counterclockwise"></i></Button>
-            <Form.Range min={MIN_IMAGE_ZOOM} step={IMAGE_ZOOM_STEP} max={MAX_IMAGE_ZOOM} value={imgZoom} onChange={handleZoomeRangeInput} id='zoomRange'/>
-            <div style={{backgroundColor:'red'}}>
-              <div className='text-bg-light'>Tags</div>
-              <TagSearch fileId={fileItemToShow?.id} tagAddedCallback={tagAddedToFile}/>
+          {isLoading ?
+            <div className='position-absolute top-50 start-50 translate-middle'>
               <div>
-                {(imgTags === null || imgTags.length <= 0) ? 
-                  <span>NO TAGS</span> : 
-                  imgTags.map(tag=><TagViewItem key={tag.id} tagItem={tag} fileOn={fileItemToShow?.id} tagRemovedCallback={tagRemovedFromFile}/>)
-                }
+                <img className={styles.rotate_image} src="/loading.png" width={100} height={100} style={{ filter: 'invert(1) opacity(0.333)' }} />
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                Loading...
+              </div>
+            </div> :
+            (imgUrl === null ?
+              <div>NO IMAGE</div> :
+              <div className='position-absolute'
+                style={{
+                  left: '0px',
+                  padding: '1rem',
+                  width: '80vw',
+                  height: '91.4vh',
+                  overflow: 'scroll'
+                }}>
+                <img src={imgUrl} style={{ width: `${imgZoom}%` }} />
+              </div>
+            )}
+          <div className='position-absolute border-start border-1'
+            style={{
+              width: '20vw',
+              padding: '1rem',
+              left: '80vw',
+              height: '91.4vh'
+            }}>
+            <div>
+              <div>Zoom</div>
+              <div>
+                <Button onClick={handleZoomIn}><i className="bi bi-zoom-in"></i></Button>
+                <span>{imgZoom}%</span>
+                <Button onClick={handleZoomOut}><i className="bi bi-zoom-out"></i></Button>
+                <Button onClick={handleResetImageZoom}><i className="bi bi-arrow-counterclockwise"></i></Button>
+                <Form.Range min={MIN_IMAGE_ZOOM} step={IMAGE_ZOOM_STEP} max={MAX_IMAGE_ZOOM} value={imgZoom} onChange={handleZoomeRangeInput} id='zoomRange' />
+              </div>
+            </div>
+            <div>
+              <div className='text-bg-light mb-2'>Tags</div>
+              <div>
+                <TagSearch fileId={fileItemToShow?.id} tagAddedCallback={tagAddedToFile} />
+                <div className='mt-2'>
+                  {(imgTags === null || imgTags.length <= 0) ?
+                    <span>NO TAGS</span> :
+                    imgTags.map(tag => <TagViewItem key={tag.id} tagItem={tag} fileOn={fileItemToShow?.id} tagRemovedCallback={tagRemovedFromFile} />)
+                  }
+                </div>
               </div>
             </div>
           </div>

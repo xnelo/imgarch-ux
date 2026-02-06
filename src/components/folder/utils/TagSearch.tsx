@@ -83,11 +83,11 @@ export default function TagSearch({fileId, tagAddedCallback}: {fileId: number | 
 
   return (
     <div className="input-group">
-      <input list="search-tag" className="form-control" type="text" placeholder="tags" autoComplete="off" onChange={searchTagChanged} value={currentInputTag}/>
+      <input list="search-tag" className="form-control" type="text" placeholder="tag name" autoComplete="off" onChange={searchTagChanged} value={currentInputTag}/>
       <datalist id="search-tag">
         {tagsInList.map((tag:FilearchTag)=><option key={tag.id} value={tag.tag_name}/>)}
       </datalist>
-      <button className="btn btn-outline-secondary" type="button" id="add-tag" disabled={!isAddTagEnabled} onClick={addTagButtonClicked}>+</button>
+      <button className="btn btn-primary" type="button" id="add-tag" disabled={!isAddTagEnabled} onClick={addTagButtonClicked}><i className="bi bi-plus"></i></button>
     </div>
   );
 }
