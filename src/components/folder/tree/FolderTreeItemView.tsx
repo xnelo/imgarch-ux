@@ -7,8 +7,7 @@ import { useDrag, useDrop } from "react-dnd";
 import { DragTypes } from "../dnd/DragTypes";
 import { Button, Modal } from "react-bootstrap";
 import toast from "react-hot-toast";
-import { ActionResponse } from "@/filearch_api/FilearchAPI";
-import { FilearchFolder } from "@/filearch_api/folder";
+import { MoveFolderAction } from "./actions/FolderActions";
 
 export default function FolderTreeItemView({data, selectFolderFunc, selectedFolderState, moveFolderEventComplete}:{data:FolderItem, selectFolderFunc:(selectedFolderId:number)=>void, selectedFolderState:number, moveFolderEventComplete:(idToMove: number, idNewParent: number, idOldParent: number)=>void}){
     const [isExpanded, setIsExpanded] = useState(false);
@@ -63,27 +62,15 @@ export default function FolderTreeItemView({data, selectFolderFunc, selectedFold
         return;
       }
 
-      const moveFolderRequest = {
-        id: folderToMove.id,
-        new_parent_id: folderToMoveTo.id
-      }
-
       try {
-        const response = await fetch("/folder/move",
-          {
-            method: 'POST',
-            headers: {
-              'accept': 'application/json'
-            },
-            body: JSON.stringify(moveFolderRequest)
-          });
 
-        if (response.status != 200) {
+        const moveFolderResponse = await MoveFolderAction(folderToMove.id, folderToMoveTo.id);
+
+        if (moveFolderResponse === null) {
           toast.error("Could not move folder '" + folderToMove.name + "'.");
         } else { 
-          const moveFolderData:ActionResponse<FilearchFolder>[] = await response.json();
-          console.debug("Move Folder Response: {}", moveFolderData);
-          moveFolderData.forEach(actionResponse => {
+          console.debug("Move Folder Response: {}", moveFolderResponse);
+          moveFolderResponse.forEach(actionResponse => {
             if (actionResponse.errors !== null) {
               actionResponse.errors.forEach(error => toast.error(<div>{error.error_message}<br/>Error Code: {error.error_code}</div>));
             } else if (actionResponse.data !== null) {

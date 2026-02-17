@@ -11,18 +11,12 @@ export interface FilearchFolder extends FilearchAPI_IdObject {
     folder_name: string;
 }
 
-interface FilearchNewFolderPayload {
-    owner_user_id: number,
-    parent_id: number,
-    folder_name: string
-}
-
-interface FilearchRenameFolderPayload {
-    folder_name: string
-}
-
-export async function AddFolder(accessToken: string, newFolderData: FilearchNewFolderPayload) {
-    try {
+export async function AddFolder(accessToken: string, newFolderName: string, parentId: number): Promise<FilearchFolder | null> {
+  const newFolderData = {
+    parent_id: parentId,
+    folder_name: newFolderName
+  };
+  try {
         const response = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/folder", 
             {
                 method: 'POST',
@@ -49,8 +43,9 @@ export async function AddFolder(accessToken: string, newFolderData: FilearchNewF
     }
 }
 
-export async function RenameFolder(accessToken: string, folderId: number, renameFolderData: FilearchRenameFolderPayload) {
+export async function RenameFolder(accessToken: string, folderId: number, folder_name: string) {
     try {
+        const renameFolderData = {folder_name: folder_name};
         const response = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/folder/" + folderId, 
             {
                 method: 'PATCH',

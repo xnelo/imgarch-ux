@@ -7,6 +7,7 @@ import { FolderItem } from "../../FolderItem";
 import { FilearchFolder } from "@/filearch_api/folder";
 import toast from "react-hot-toast";
 import { NO_FOLDER_SELECTED } from "../../FolderView";
+import { RenameFolderAction } from "../actions/FolderActions";
 
 export default function RenameFolder({selectedFolderId, selectedFolderData, renameFolderEventComplete}: {selectedFolderId:number, selectedFolderData: FolderItem|undefined, renameFolderEventComplete:(toRename:FilearchFolder)=>void}) {
 
@@ -32,29 +33,17 @@ export default function RenameFolder({selectedFolderId, selectedFolderData, rena
             return;
         }
 
-        const renameRequest = {
-            id: selectedFolderData.id,
-            folder_name: newFolderName
-        };
-
         try {
-            const response = await fetch("/folder/rename", {
-                method: 'POST',
-                headers:{
-                    'accept': 'application/json'
-                },
-                body: JSON.stringify(renameRequest)
-            });
+            const renameResponse = await RenameFolderAction(newFolderName, selectedFolderData.id);
             
-            if (response.status != 200) {
-                console.error("Error while renaming folder.");
+            if (renameResponse === null) {
+                toast.error("Error while renaming folder.");
             } else {
-                const renameFolderData = await response.json();
-                console.debug("Rename Folder: {}", renameFolderData);
-                renameFolderEventComplete(renameFolderData);
+                console.debug("Rename Folder: {}", renameResponse);
+                renameFolderEventComplete(renameResponse);
             }
         } catch (error) {
-            console.error("error: " , error);
+            toast.error("error: " + error);
         }
     };
 
