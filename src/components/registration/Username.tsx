@@ -1,6 +1,7 @@
 'use client'
 
 import { FormEvent, useState } from "react";
+import { IsUsernameAvailableAction } from "./actions";
 
 interface UsernameProps {
     inputId?: string
@@ -22,21 +23,10 @@ const Username: React.FC<UsernameProps> = ({inputId, username}) => {
             setIsValid(false);
         } else {
             try {
-                const response = await fetch("/username/available?username=" + inputValue,
-                {
-                    method: 'GET',
-                    headers: {
-                        'accept': 'application/json'
-                    }
-                });
+                const UsernameAvailableResponse = await IsUsernameAvailableAction(inputValue);
             
-                if (response.status != 200) {
-                    console.error('Error while validating username is available. status=', response.status)   
-                } else {
-                    const isUsernameAvailable = await response.json();
-                    console.info('is username available: ', isUsernameAvailable);
-                    setIsValid(isUsernameAvailable);
-                }
+                console.info('is username available: ', UsernameAvailableResponse);
+                setIsValid(UsernameAvailableResponse);
             } catch (error) {
                 console.error('Error :', error);
             }

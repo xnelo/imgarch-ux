@@ -3,8 +3,8 @@ import { cookies } from 'next/headers'
 import * as client from 'openid-client'
 
 export const clientConfig = {
-  url: process.env.NEXT_PUBLIC_API_URL,
-  audience: process.env.NEXT_PUBLIC_API_URL,
+  url: process.env.NEXT_PUBLIC_OPENIDC_URL,
+  audience: process.env.NEXT_PUBLIC_OPENIDC_URL,
   client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
   scope: process.env.NEXT_PUBLIC_SCOPE,
   redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/auth/openiddict`,
@@ -48,7 +48,7 @@ export const defaultSession: SessionData = {
 }
 
 export const sessionOptions: SessionOptions = {
-  password: 'complex_password_at_least_32_characters_long',
+  password: 'complex_password_at_least_32_characters_long', //TODO: use env variable for this in production and make sure it's long and complex enough
   cookieName: 'imgarch_ux_session',
   cookieOptions: {
     // secure only works in `https` environments
@@ -69,6 +69,6 @@ export async function getSession(): Promise<IronSession<SessionData>> {
 }
 
 export async function getClientConfig() {
-    const options1={execute:[client.allowInsecureRequests]};
+    const options1={execute:[client.allowInsecureRequests]}; // TODO: remove allowInsecureRequests and make sure to use https in production
   return await client.discovery(new URL(clientConfig.url!), clientConfig.client_id!, undefined, undefined, options1)
 }
