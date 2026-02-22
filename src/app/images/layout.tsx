@@ -1,6 +1,4 @@
-import Image from 'next/image'
-
-export default function UserLayout({
+export default async function UserLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -12,6 +10,18 @@ export default function UserLayout({
                 <span className="navbar-brand">
                     Image Arch
                 </span>
+
+                <div className="collapse navbar-collapse" id="navbarSupportedContent">
+                  <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li className="nav-item">
+                      <a className="nav-link" href="/images/folder">Folders</a>
+                    </li>
+                    <li className="nav-item">
+                      <a className="nav-link" href="/images/search">Search</a>
+                    </li>
+                  </ul>
+                </div>
+
                 <div className='d-flex dropdown'>
                   <button 
                     className='btn btn-primary' 

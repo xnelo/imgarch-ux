@@ -11,7 +11,7 @@ export const clientConfig = {
   post_logout_redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}`,
   response_type: 'code',
   grant_type: 'authorization_code',
-  post_login_route: `${process.env.NEXT_PUBLIC_APP_URL}/user`,
+  post_login_route: `${process.env.NEXT_PUBLIC_APP_URL}/images/folder`,
   registration_route: `${process.env.NEXT_PUBLIC_APP_URL}/registration`,
   code_challenge_method: 'S256'
 }

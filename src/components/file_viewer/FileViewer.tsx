@@ -3,13 +3,13 @@
 import Modal from 'react-bootstrap/Modal';
 import { ChangeEvent, useEffect, useState } from "react";
 import { FileItem } from './FileItem';
-import styles from "./FolderContent.module.css"
+import styles from "./FileViewer.module.css";
 import { DownloadImage } from './actions/DownloadImage';
 import { Accordion, Button, Form } from 'react-bootstrap';
 import { GetTagsForFile } from './actions/Tags';
 import { FilearchTag } from '@/filearch_api/tag';
-import TagSearch from '../utils/TagSearch';
-import TagViewItem, { TagItem } from '../utils/TagViewItem';
+import TagSearch from './TagSearch';
+import TagViewItem, { TagItem } from './TagViewItem';
 import { AccordionEventKey } from 'react-bootstrap/esm/AccordionContext';
 
 const DEFAULT_IMAGE_ZOOM: number = 100;
