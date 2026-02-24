@@ -3,7 +3,7 @@ import logger from '@/lib/logger';
 import { GetAllFolders } from '@/filearch_api/folder';
 import FolderView from '@/components/folder/FolderView';
 
-export default async function UserPage() {
+export default async function FolderPage() {
     const session = await getSession();
     logger.debug(JSON.stringify(session, null, 2));
     

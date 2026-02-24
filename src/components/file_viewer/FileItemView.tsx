@@ -3,7 +3,7 @@
 import { FileItem } from "./FileItem";
 import { useEffect, useState } from "react";
 import { DownloadThumbnail } from "./actions/DownloadImage";
-import styles from "./FolderContent.module.css"
+import styles from "./FileViewer.module.css";
 import { Button } from "react-bootstrap";
 import { DeleteFileAction } from "./actions/DeleteFile";
 import { FilearchFile } from "@/filearch_api/files";

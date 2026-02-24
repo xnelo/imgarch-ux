@@ -4,10 +4,9 @@ import ActionButtonBase from "./ActionButtonBase";
 import { FolderItem } from "../../FolderItem";
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import { ActionResponse } from "@/filearch_api/FilearchAPI";
-import { FilearchFolder } from "@/filearch_api/folder";
 import toast from 'react-hot-toast';
 import { NO_FOLDER_SELECTED } from "../../FolderView";
+import { DeleteFolderAction } from "../actions/FolderActions";
 
 export default function DeleteFolder({selectedFolder, selectedFolderData, deleteFolderEventComplete}: {selectedFolder: number, selectedFolderData: FolderItem|undefined, deleteFolderEventComplete: (deletedId: number)=>void}) {
     const [show, setShow] = useState(false);
@@ -18,19 +17,13 @@ export default function DeleteFolder({selectedFolder, selectedFolderData, delete
         setShow(false);
         
         try {
-            const response = await fetch("/folder/delete/" + idToDelete, {
-                method: 'DELETE',
-                headers: {
-                    'accept': 'application/json'
-                }
-            });
+            const deleteFolderResponse = await DeleteFolderAction(idToDelete);
 
-            if (response.status != 200) {
+            if (deleteFolderResponse === null) {
                 toast.error("Could not delete folder " + idToDelete);
             } else {
-                const deleteFolderData:ActionResponse<FilearchFolder>[] = await response.json();
-                console.debug("Deleted folder: {}", deleteFolderData);
-                deleteFolderData.forEach(actionResponse => {
+                console.debug("Deleted folder: {}", deleteFolderResponse);
+                deleteFolderResponse.forEach(actionResponse => {
                     if (actionResponse.errors !== null) {
                         actionResponse.errors.forEach(error=>toast.error(<div>{error.error_message}<br/>Error Code: {error.error_code}</div>));
                     } else if (actionResponse.data !== null) {

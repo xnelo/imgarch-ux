@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import styles from "./FolderUtils.module.css";
+import styles from "./FileViewer.module.css";
 import { RemoveTagFromFile } from "./actions/TagActions";
 
 export interface TagItem {

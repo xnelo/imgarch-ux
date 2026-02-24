@@ -4,41 +4,26 @@ import { useState } from "react";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import ActionButtonBase from "./ActionButtonBase";
-import useSession from "@/hooks/useSession";
 import { FilearchFolder } from "@/filearch_api/folder";
+import { AddFolderAction } from "../actions/FolderActions";
 
 export default function AddFolder({selectedFolder, addFolderEventComplete}:{selectedFolder:number, addFolderEventComplete:(folderToAdd:FilearchFolder)=>void}) {
     const [show, setShow] = useState(false);
     const [newFolderName, setNewFolderName] = useState('');
 
-    const session = useSession();
-
     const handleShow = () => setShow(true);
     const handleClose = () => setShow(false);
     const handleAddFolder = async () => {
         setShow(false);
-        
-        const folderRequest = {
-            owner_user_id: session.session?.userInfo?.registration_info?.user_id,
-            parent_id: selectedFolder,
-            folder_name: newFolderName
-        };
 
         try {
-            const response = await fetch("/folder/add",{
-                method: 'POST',
-                headers: {
-                    'accept': 'application/json'
-                },
-                body: JSON.stringify(folderRequest)
-            });
+            const addFolderResponse = await AddFolderAction(newFolderName, selectedFolder);
 
-            if (response.status != 200) {
+            if (addFolderResponse === null) {
                 console.error("Error while adding new folder [AddFolder.tsx].");
             } else {
-                const newFolderData = await response.json();
-                console.debug("New Folder: {}", newFolderData);
-                addFolderEventComplete(newFolderData);
+                console.debug("New Folder: {}", addFolderResponse);
+                addFolderEventComplete(addFolderResponse);
             }
         } catch (error) {
             console.error("error: ", error);
