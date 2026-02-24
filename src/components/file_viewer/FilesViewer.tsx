@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { FileItem } from "./FileItem";
 import FileItemView from "./FileItemView";
 import { useInView } from "react-intersection-observer";
-import { FolderItem } from "../folder/FolderItem";
-import { GetFiles } from "./actions/GetFiles";
 import FileViewer from "./FileViewer";
+import { PaginationContract } from "@/filearch_api/FilearchAPI";
+import { FilearchFile } from "@/filearch_api/files";
 
 function removeFile(currData: FileItem[], deletedId: number): FileItem[] {
   const newArray: FileItem[] = [];
@@ -20,47 +20,46 @@ function removeFile(currData: FileItem[], deletedId: number): FileItem[] {
   return newArray;
 }
 
-export default function FilesViewer({ selectedFolderItem }: { selectedFolderItem: FolderItem | undefined }) {
+/**
+ * Files Viewer component. Used to display files in a folder, with infinite scroll pagination. Also handles showing the file viewer modal when a file is selected.
+ * @param getFileFunction Function that takes an afterId (for pagination) and returns a PaginationContract of FilearchFiles. This is used to fetch the files to display.
+ * @param refreshTrigger A number that is used to trigger a refresh of the file list when it changes. This should be incremented whenever the underlying data changes (e.g. a file is added or deleted) to ensure the viewer fetches the latest data. 
+ */
+export default function FilesViewer({ getFileFunction, refreshTrigger }: { getFileFunction: (afterId: number|null) => Promise<PaginationContract<FilearchFile> | null>, refreshTrigger: number }) {
   const [data, setData] = useState<FileItem[]>([]);
   const [moreToLoad, setMoreToLoad] = useState<boolean>(true);
   const [lastListItemId, setLastListItemId] = useState<number | null>(null);
   const { ref, inView } = useInView();
 
   const fetchData = async (isInitialCall: boolean) => {
-    if (selectedFolderItem === undefined) {
+    const res = await getFileFunction(isInitialCall ? null : lastListItemId);
+    if (res === null || res.data === null || res.data.length < 1) {
       setData([]);
       setMoreToLoad(false);
       setLastListItemId(null);
     } else {
-      const res = await GetFiles(selectedFolderItem.id, isInitialCall ? null : lastListItemId);
-      if (res === null || res.data === null || res.data.length < 1) {
-        setData([]);
-        setMoreToLoad(false);
-        setLastListItemId(null);
+      const mappedResults = res.data.map(z => ({
+        id: z.id,
+        ownerId: z.owner_id,
+        folderId: z.folder_id,
+        storageType: z.storage_type,
+        storageKey: z.storage_key,
+        originalFilename: z.original_filename,
+        mimeType: z.mime_type
+      }));
+      setLastListItemId(mappedResults[mappedResults.length - 1].id);
+      if (isInitialCall) {
+        setData(mappedResults);
       } else {
-        const mappedResults = res.data.map(z => ({
-          id: z.id,
-          ownerId: z.owner_id,
-          folderId: z.folder_id,
-          storageType: z.storage_type,
-          storageKey: z.storage_key,
-          originalFilename: z.original_filename,
-          mimeType: z.mime_type
-        }));
-        setLastListItemId(mappedResults[mappedResults.length - 1].id);
-        if (isInitialCall) {
-          setData(mappedResults);
-        } else {
-          setData(existingData => [...existingData, ...mappedResults]);
-        }
-        setMoreToLoad(res.has_next);
+        setData(existingData => [...existingData, ...mappedResults]);
       }
+      setMoreToLoad(res.has_next);
     }
   };
 
   useEffect(() => {
     fetchData(true);
-  }, [selectedFolderItem]);
+  }, [refreshTrigger]);
 
   useEffect(() => {
     if (inView) {

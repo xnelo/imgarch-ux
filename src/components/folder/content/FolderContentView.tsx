@@ -3,16 +3,14 @@
 import { FolderItem } from "../FolderItem";
 import { Button } from "react-bootstrap";
 import { UploadImage } from "./actions/UploadFiles";
-import { ActionResponse, ErrorResponse, FilearchAPIResponse } from "@/filearch_api/FilearchAPI";
+import { ActionResponse, ErrorResponse, FilearchAPIResponse, PaginationContract } from "@/filearch_api/FilearchAPI";
 import { FilearchFile } from "@/filearch_api/files";
 import toast from "react-hot-toast";
 import FilesViewer from "@/components/file_viewer/FilesViewer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { GetFiles } from "@/components/folder/content/actions/GetFiles";
 
 export default function FolderContentView({ selectedFolderItem }: { selectedFolderItem: FolderItem | undefined }) {
-
-  const [filesViewerKey, setFilesViewerKey] = useState<number>(0);
-
   const addFiles = async () => {
     document.getElementById("fileOpenElement")?.click();
   };
@@ -49,13 +47,23 @@ export default function FolderContentView({ selectedFolderItem }: { selectedFold
           }
         }
       }
-      refreshFilesViewer();
+      setRefreshTrigger(prev => prev + 1);
     }
   };
 
-  function refreshFilesViewer() {
-    setFilesViewerKey(prevKey => prevKey + 1);
+  async function getFiles_Internal(afterId: number | null): Promise<PaginationContract<FilearchFile> | null> {
+    if (selectedFolderItem === undefined) {
+      return null;
+    } else {
+      return await GetFiles(selectedFolderItem.id, afterId);
+    }
   }
+
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+
+  useEffect(() => {
+    setRefreshTrigger(prev => prev + 1);
+  }, [selectedFolderItem]);
 
   return (
 
@@ -64,7 +72,7 @@ export default function FolderContentView({ selectedFolderItem }: { selectedFold
         borderBottom: 'var(--bs-border-color) 1px solid',
         padding: '0.5rem'
       }}>Folder: {selectedFolderItem?.name}</h2>
-      <FilesViewer key={filesViewerKey} selectedFolderItem={selectedFolderItem} />
+      <FilesViewer getFileFunction={getFiles_Internal} refreshTrigger={refreshTrigger}/>
       <Button disabled={selectedFolderItem === undefined} onClick={addFiles} style={{ position: "absolute", top: "calc(100vh - 13rem)", left: "calc(75vw - 6rem)", borderRadius: "30px", padding: "11px 16px", border: "solid 1px var(--bs-secondary)" }}>
         <i className="bi bi-plus-lg"></i>
       </Button>
