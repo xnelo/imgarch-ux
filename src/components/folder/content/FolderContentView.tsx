@@ -72,7 +72,15 @@ export default function FolderContentView({ selectedFolderItem }: { selectedFold
         borderBottom: 'var(--bs-border-color) 1px solid',
         padding: '0.5rem'
       }}>Folder: {selectedFolderItem?.name}</h2>
-      <FilesViewer getFileFunction={getFiles_Internal} refreshTrigger={refreshTrigger}/>
+      <FilesViewer 
+        getFileFunction={getFiles_Internal} 
+        refreshTrigger={refreshTrigger}
+        style={{
+          position: 'absolute',
+          height: 'calc(100vh - 12.75rem)',
+          width: 'calc(75vw - 0.5rem)',
+          left: '0.5rem'
+        }}/>
       <Button disabled={selectedFolderItem === undefined} onClick={addFiles} style={{ position: "absolute", top: "calc(100vh - 13rem)", left: "calc(75vw - 6rem)", borderRadius: "30px", padding: "11px 16px", border: "solid 1px var(--bs-secondary)" }}>
         <i className="bi bi-plus-lg"></i>
       </Button>

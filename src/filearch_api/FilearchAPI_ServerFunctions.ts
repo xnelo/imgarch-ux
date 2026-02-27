@@ -52,7 +52,8 @@ export async function SinglePaginatedCall<T>(
   after:number | null,
   sortDirection:SortDirection,
   limit:number,
-  resourceType:ResourceType) : Promise<ActionResponse<PaginationContract<T>>> {
+  resourceType:ResourceType,
+  additionalUrlParams?:[string, string][]) : Promise<ActionResponse<PaginationContract<T>>> {
     
   // create the final URL
   let searchParams : URLSearchParams = new URLSearchParams();
@@ -61,6 +62,12 @@ export async function SinglePaginatedCall<T>(
   }
   searchParams.append("direction", sortDirection.toString());
   searchParams.append("limit", limit.toString());
+
+  if (additionalUrlParams !== undefined && additionalUrlParams.length > 0) {
+    additionalUrlParams.forEach((param:[string, string]) => {
+      searchParams.append(param[0], param[1]);
+    });
+  }
 
   const finalURL:string = url + `?${searchParams.toString()}`;
 
