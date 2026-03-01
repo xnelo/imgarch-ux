@@ -1,8 +1,13 @@
-export default async function UserLayout({
+'use client'
+import { useSelectedLayoutSegment } from "next/navigation";
+
+export default function UserLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const segment = useSelectedLayoutSegment()
+  
   return (
     <div>
         <nav className="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
@@ -14,10 +19,10 @@ export default async function UserLayout({
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                   <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                     <li className="nav-item">
-                      <a className="nav-link" href="/images/folder">Folders</a>
+                      <a className={`nav-link ${segment === 'folder' ? 'active' : ''}`} href="/images/folder">Folders</a>
                     </li>
                     <li className="nav-item">
-                      <a className="nav-link" href="/images/search">Search</a>
+                      <a className={`nav-link ${segment === 'search' ? 'active' : ''}`} href="/images/search">Search</a>
                     </li>
                   </ul>
                 </div>

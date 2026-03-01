@@ -11,6 +11,30 @@ export interface FilearchFile extends FilearchAPI_IdObject {
   mime_type: string;
 }
 
+export async function GetPaginatedSearchFiles(
+  accessToken:string, 
+  searchTerm: string,
+  afterId:number|null,
+  limit:number): Promise<PaginationContract<FilearchFile> | null> {
+
+  const additionalParams: [string, string][] = [["search_term", searchTerm]];
+
+  const data: ActionResponse<PaginationContract<FilearchFile>> = 
+    await SinglePaginatedCall<FilearchFile>(
+      accessToken,
+      process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/search",
+      afterId,
+      SortDirection.ASCENDING,
+      limit,
+      ResourceType.FILE,
+      additionalParams);
+  if (data.errors !== null && data.errors.length > 0) {
+    logActionResponseErrors(data);
+    return null;
+  }
+  return data.data;
+}
+
 export async function GetPaginatedFiles(
     accessToken:string, 
     folderId:number, 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { CSSProperties, useEffect, useState } from "react";
 import { FileItem } from "./FileItem";
 import FileItemView from "./FileItemView";
 import { useInView } from "react-intersection-observer";
@@ -25,7 +25,7 @@ function removeFile(currData: FileItem[], deletedId: number): FileItem[] {
  * @param getFileFunction Function that takes an afterId (for pagination) and returns a PaginationContract of FilearchFiles. This is used to fetch the files to display.
  * @param refreshTrigger A number that is used to trigger a refresh of the file list when it changes. This should be incremented whenever the underlying data changes (e.g. a file is added or deleted) to ensure the viewer fetches the latest data. 
  */
-export default function FilesViewer({ getFileFunction, refreshTrigger }: { getFileFunction: (afterId: number|null) => Promise<PaginationContract<FilearchFile> | null>, refreshTrigger: number }) {
+export default function FilesViewer({ getFileFunction, refreshTrigger, style }: { getFileFunction: (afterId: number|null) => Promise<PaginationContract<FilearchFile> | null>, refreshTrigger: number, style?: CSSProperties | undefined }) {
   const [data, setData] = useState<FileItem[]>([]);
   const [moreToLoad, setMoreToLoad] = useState<boolean>(true);
   const [lastListItemId, setLastListItemId] = useState<number | null>(null);
@@ -89,12 +89,8 @@ export default function FilesViewer({ getFileFunction, refreshTrigger }: { getFi
         show={show}
         fileItemToShow={shownFileItem}
         onHideCallback={handleCloseSelectedImage} />
-      <div className="position-absolute overflow-y-scroll"
-        style={{
-          height: 'calc(100vh - 12.75rem)',
-          width: 'calc(75vw - 0.5rem)',
-          left: '0.5rem'
-        }}>
+      <div className="overflow-y-scroll"
+        style={style}>
         {data.length <= 0 ?
           <div className="text-center"
             style={{
@@ -104,7 +100,7 @@ export default function FilesViewer({ getFileFunction, refreshTrigger }: { getFi
             <i className="bi bi-x-circle text-danger" style={{ fontSize: '4rem' }}></i>
             <h3>NO DATA</h3>
           </div> :
-          <div className="row" style={{ width: 'calc(75vw - 1.0rem' }}>
+          <div className="row" style={{ width: '100%' }}>
             {data.map(file => <FileItemView key={file.id} fileData={file} deleteEventCompleteCallback={deleteFileEventComplete} showSelectedImageCallback={handleShowSelectedImage} />)}
             {moreToLoad &&
               <div className="text-center" ref={ref}>
