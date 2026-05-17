@@ -1,9 +1,9 @@
-import { getSession } from '@/lib/lib';
-import logger from '@/lib/logger';
-import { GetAllFolders } from '@/filearch_api/folder';
-import FolderView from '@/components/folder/FolderView';
+import GroupView from "@/components/group_view/GroupView";
+import { GetGroupsIn } from "@/filearch_api/group";
+import { getSession } from "@/lib/lib";
+import logger from "@/lib/logger";
 
-export default async function FolderPage() {
+export default async function GroupsPage() {
     const session = await getSession();
     logger.debug(JSON.stringify(session, null, 2));
     
@@ -17,11 +17,11 @@ export default async function FolderPage() {
             </main>
         );
     } 
-    const folders = GetAllFolders(session.access_token);
+    const groups = GetGroupsIn(session.access_token);
 
     return (
         <main>
-            <FolderView folders={folders}/>
+          <GroupView groups={groups}/>
         </main>
     )
 }
