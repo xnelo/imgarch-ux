@@ -10,13 +10,19 @@ export function logActionResponseErrors<T>(actionResponse: ActionResponse<T>):vo
     });
 }
 
-export async function GetAllPaginatedData<T extends FilearchAPI_IdObject>(accessToken:string, url:string, sortDirection:SortDirection, limit:number, resourceType: ResourceType): Promise<T[] | null> {
+export async function GetAllPaginatedData<T extends FilearchAPI_IdObject>(
+      accessToken:string, 
+      url:string, 
+      sortDirection:SortDirection, 
+      limit:number, 
+      resourceType: ResourceType,
+      additionalUrlParams?: [string, string][]): Promise<T[] | null> {
   let outputData: T[] = [];
   let hasMoreData : boolean = true;
   let after : number | null = null;
   while(hasMoreData) {
     const paginationCall: ActionResponse<PaginationContract<T>> | null = 
-      await SinglePaginatedCall(accessToken, url, after, sortDirection, limit, resourceType);
+      await SinglePaginatedCall(accessToken, url, after, sortDirection, limit, resourceType, additionalUrlParams);
 
     if (paginationCall === null) {
       logger.error("Error during a pagination call; URL=" + url);

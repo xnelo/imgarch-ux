@@ -2,6 +2,7 @@ import { getSession } from '@/lib/lib';
 import logger from '@/lib/logger';
 import { GetAllFolders } from '@/filearch_api/folder';
 import FolderView from '@/components/folder/FolderView';
+import { GetGroupsIn } from '@/filearch_api/group';
 
 export default async function FolderPage() {
     const session = await getSession();
@@ -18,11 +19,11 @@ export default async function FolderPage() {
         );
     } 
     const folders = GetAllFolders(session.access_token);
-    
+    const groups = GetGroupsIn(session.access_token);
 
     return (
         <main>
-            <FolderView folders={folders}/>
+            <FolderView folders={folders} groups={groups}/>
         </main>
     )
 }

@@ -1,9 +1,11 @@
 export enum ResourceType {
   USER,
   FILE,
+  FILE_IDS,
   FOLDER,
-  USERNAME,
-  TAG
+  TAG,
+  USERNAME, 
+  GROUP
 }
 
 export enum ActionType {
@@ -13,9 +15,16 @@ export enum ActionType {
   GET,
   DELETE,
   DOWNLOAD,
-  SEARCH,
   ASSIGN,
-  UNASSIGN
+  UNASSIGN,
+  SEARCH,
+  ADD_USER_TO_GROUP,
+  REMOVE_USER_FROM_GROUP,
+  ACCEPT_GROUP_INVITE,
+  ADD_ITEM_TO_GROUP,
+  REMOVE_ITEM_FROM_GROUP,
+  GET_GROUP_PERMISSIONS,
+  MODIFY_GROUP_PERMISSIONS
 }
 
 export enum StorageType {
