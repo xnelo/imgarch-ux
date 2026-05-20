@@ -1,7 +1,9 @@
 'use client'
 
-import { FilearchGroup } from "@/filearch_api/group";
 import { Suspense, use, useState } from "react";
+import GroupItemView from "./GroupItemView";
+import styles from "./GroupView.module.css"
+import { FilearchGroup } from "@/filearch_api/FilearchAPI";
 
 export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null>}) {
   const tmpAllGroups = use(groups);
@@ -34,9 +36,9 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
               }}>
             <div>
               <Suspense fallback={<div>Loading...</div>}>
-                {(allGroups === null) 
+                {(allGroups === null || allGroups.length <= 0) 
                   ? <div>NO DATA</div>
-                  : <ul>{allGroups.map(i => <li key={i.id}>{i.group_name}</li>)}</ul>
+                  : <ul className={styles.GroupList}>{allGroups.map(i => <GroupItemView key={i.id} groupInfo={i}/>)}</ul>
                 }
               </Suspense>
             </div>

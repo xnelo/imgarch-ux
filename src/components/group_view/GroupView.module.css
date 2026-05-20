@@ -1,0 +1,6 @@
+.GroupList {
+  list-style-type: none;
+  border-left: var(--bs-gray-600) 1px solid;
+  margin-left: 0.3rem;
+  padding-left: 0.3rem;
+}

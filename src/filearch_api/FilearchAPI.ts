@@ -74,6 +74,19 @@ export function HandleErrorResponse<T>(apiResponse: FilearchAPIResponse<T>) : vo
     apiResponse.action_responses.forEach(HandleActionResponse)
 }
 
+export enum FilearchGroupMembershipType {
+  OWNER = 'OWNER',
+  ADMIN = 'ADMIN',
+  MEMBER = 'MEMBER'
+}
+
+export interface FilearchGroup extends FilearchAPI_IdObject {
+  owner_user_id: number;
+  group_name: string;
+  accepted: boolean;
+  group_membership_type: FilearchGroupMembershipType;
+}
+
 function aggregateErrorResponseArrays(prevVal: ErrorResponse[] | null | undefined, currVal: ErrorResponse[]|null) {
   if (prevVal === undefined || prevVal === null) {
     return [];
