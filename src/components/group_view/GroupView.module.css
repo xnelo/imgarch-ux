@@ -4,3 +4,11 @@
   margin-left: 0.3rem;
   padding-left: 0.3rem;
 }
+
+.GroupToolButtonSizing{
+  padding: 1px 6px;
+}
+
+.GroupToolIconSizing{
+  font-size: 1rem;
+}

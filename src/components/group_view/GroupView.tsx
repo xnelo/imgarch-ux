@@ -4,6 +4,8 @@ import { Suspense, use, useState } from "react";
 import GroupItemView from "./GroupItemView";
 import styles from "./GroupView.module.css"
 import { FilearchGroup } from "@/filearch_api/FilearchAPI";
+import { Button } from "react-bootstrap";
+import AddGroup from "./action_buttons/AddGroup";
 
 export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null>}) {
   const tmpAllGroups = use(groups);
@@ -14,6 +16,14 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
     }
 
   let [allGroups, setAllGroups] = useState<FilearchGroup[] | null>(tmpAllGroups);
+
+  function addGroupEventComplete(groupToAdd: FilearchGroup) {
+    if (allGroups === null) {
+      setAllGroups([groupToAdd]);
+    } else {
+      setAllGroups([...allGroups, groupToAdd]);
+    }
+  }
 
   return (
       <div className='container-fluid'>
@@ -27,7 +37,7 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
             borderRight: 'var(--bs-border-color) 1px solid'
           }}>
           <div className="container">
-            <span>TOOLS</span>
+            <AddGroup addGroupEventComplete={addGroupEventComplete}/>
           </div>
           <div className='position-absolute overflow-y-scroll overflow-x-scroll'
               style={{

@@ -4,6 +4,7 @@ import { MouseEvent } from "react";
 import { NO_FOLDER_SELECTED } from "../../FolderView";
 import styles from "../FolderTree.module.css"
 
+//TODO: Refactor this to use ActionButtonGeneric
 export default function ActionButtonBase({iconName, selectedFolder, onClickEvent, isDisabledCheck}:{iconName: string, selectedFolder: number, onClickEvent:(event:MouseEvent<HTMLElement>)=>void, isDisabledCheck?:()=>boolean | undefined}) {
 
   function isDisabled() : boolean{
