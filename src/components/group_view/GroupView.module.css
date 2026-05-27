@@ -12,3 +12,18 @@
 .GroupToolIconSizing{
   font-size: 1rem;
 }
+
+.GroupName {
+  cursor: pointer;
+  text-decoration: none;
+  width: 70%;
+  float: left;
+  overflow: hidden;
+  margin: 1px;
+}
+
+.GroupName:hover { 
+  text-decoration: underline;
+  margin: 0px;
+  border: var(--bs-link-hover-color) 1px dotted;
+}
