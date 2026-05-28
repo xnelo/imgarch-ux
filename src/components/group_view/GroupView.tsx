@@ -7,6 +7,7 @@ import { FilearchGroup } from "@/filearch_api/FilearchAPI";
 import { Button } from "react-bootstrap";
 import AddGroup from "./action_buttons/AddGroup";
 import RemoveGroup from "./action_buttons/RemoveGroup";
+import AddPersionToGroup from "./action_buttons/AddPersonToGroup";
 
 export const NO_GROUP_SELECTED: number = -1;
 
@@ -80,6 +81,7 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
           <div className="container">
             <AddGroup addGroupEventComplete={addGroupEventComplete}/>
             <RemoveGroup selectedGroup={selectedGroupData} deleteGroupEventComplete={deleteGroupEventComplete}/>
+            <AddPersionToGroup selectedGroup={selectedGroupData}/>
           </div>
           <div className='position-absolute overflow-y-scroll overflow-x-scroll'
               style={{
@@ -90,7 +92,7 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
               <Suspense fallback={<div>Loading...</div>}>
                 {(allGroups === null || allGroups.length <= 0) 
                   ? <div>NO DATA</div>
-                  : <ul className={styles.GroupList}>{allGroups.map(i => <GroupItemView key={i.id} groupInfo={i} selectGroupEvent={selectGroupEvent}/>)}</ul>
+                  : <ul className={styles.GroupList}>{allGroups.map(i => <GroupItemView key={i.id} groupInfo={i} selectedGroupId={selectedGroup} selectGroupEvent={selectGroupEvent}/>)}</ul>
                 }
               </Suspense>
             </div>

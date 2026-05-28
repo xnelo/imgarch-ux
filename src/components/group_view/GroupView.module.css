@@ -13,13 +13,18 @@
   font-size: 1rem;
 }
 
+.GroupItemSelected {
+  background-color: var(--bs-primary-bg-subtle);
+}
+
 .GroupName {
   cursor: pointer;
   text-decoration: none;
   width: 70%;
-  float: left;
+  display: inline-flex;
   overflow: hidden;
   margin: 1px;
+  white-space: nowrap;
 }
 
 .GroupName:hover { 

@@ -1,5 +1,5 @@
 import logger from "@/lib/logger";
-import { ActionResponse, FilearchGroup, HandleErrorResponse, ResourceType, SortDirection } from "./FilearchAPI";
+import { ActionResponse, ActionType, FilearchAPIResponse, FilearchGroup, HandleErrorResponse, ResourceType, SortDirection } from "./FilearchAPI";
 import { GetAllPaginatedData } from "./FilearchAPI_ServerFunctions";
 import { group } from "console";
 
@@ -72,5 +72,42 @@ export async function DeleteGroup(accessToken: string, groupId: number) {
     return actionResponse.data;
   } catch (error) {
     logger.error("Error deleting group: ", error);
+  }
+}
+
+export async function AddPeopleToGroup(accessToken: string, groupId: number, usersToAdd: string[]) : Promise<ActionResponse<string>[]> {
+  const addToGroupData = {
+    user_to_add: usersToAdd
+  };
+  try {
+    const addToGroupResponse = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/group/" + groupId + "/add_users",
+      {
+        method: "POST",
+        headers: {
+          'accept': 'application/json',
+          'Authorization': 'Bearer ' + accessToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(addToGroupData)
+      });
+      
+      const responseData:FilearchAPIResponse<string> = await addToGroupResponse.json();
+      return responseData.action_responses;
+  } catch (error) {
+    logger.error("Error adding users to group: " + error);
+    return [
+      {
+        type:ResourceType.GROUP,
+        action:ActionType.ADD_USER_TO_GROUP,
+        data:null, 
+        errors:[
+          {
+            error_code:7000,
+            error_message:"Error adding user to group. See Logs for details.",
+            http_code:500
+          }
+        ]
+      }
+    ];
   }
 }
