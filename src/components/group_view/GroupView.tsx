@@ -8,6 +8,7 @@ import { Button } from "react-bootstrap";
 import AddGroup from "./action_buttons/AddGroup";
 import RemoveGroup from "./action_buttons/RemoveGroup";
 import AddPersionToGroup from "./action_buttons/AddPersonToGroup";
+import RemovePersonFromGroup from "./action_buttons/RemovePersonFromGroup";
 
 export const NO_GROUP_SELECTED: number = -1;
 
@@ -82,6 +83,7 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
             <AddGroup addGroupEventComplete={addGroupEventComplete}/>
             <RemoveGroup selectedGroup={selectedGroupData} deleteGroupEventComplete={deleteGroupEventComplete}/>
             <AddPersionToGroup selectedGroup={selectedGroupData}/>
+            <RemovePersonFromGroup selectedGroup={selectedGroupData}/>
           </div>
           <div className='position-absolute overflow-y-scroll overflow-x-scroll'
               style={{

@@ -1,5 +1,5 @@
 import logger from "@/lib/logger";
-import { ActionResponse, ActionType, FilearchAPIResponse, FilearchGroup, HandleErrorResponse, ResourceType, SortDirection } from "./FilearchAPI";
+import { ActionResponse, ActionType, FilearchAPIResponse, FilearchGroup, FilearchGroupMember, HandleErrorResponse, ResourceType, SortDirection } from "./FilearchAPI";
 import { GetAllPaginatedData } from "./FilearchAPI_ServerFunctions";
 import { group } from "console";
 
@@ -104,6 +104,72 @@ export async function AddPeopleToGroup(accessToken: string, groupId: number, use
           {
             error_code:7000,
             error_message:"Error adding user to group. See Logs for details.",
+            http_code:500
+          }
+        ]
+      }
+    ];
+  }
+}
+
+export async function GetMembersInGroup(accessToken: string, groupId: number) : Promise<FilearchGroupMember[]> {
+  try{
+    const membersInGroupResponse = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/group/" + groupId + "/users_in_group",
+      {
+        method: "GET",
+        headers: {
+          'accept': 'application/json',
+          'Authorization': 'Bearer ' + accessToken
+        }
+      });
+    
+    if (membersInGroupResponse.status != 200) {
+      HandleErrorResponse(await membersInGroupResponse.json());
+      return [];
+    } else {
+      const data:FilearchAPIResponse<FilearchGroupMember[]> = await membersInGroupResponse.json();
+      const returnData: FilearchGroupMember[] | null = data.action_responses[0].data;
+      if (returnData === null) {
+        return [];
+      } else {
+        return returnData;
+      }
+    }
+  } catch (error) {
+    logger.error("Error while getting group members: group_id=" + groupId + " error: " + error);
+    return [];
+  }
+}
+
+export async function RemovePeopleFromGroup(accessToken: string, groupId:number, usersToRemove:string[]) : Promise<ActionResponse<string>[]> {
+  const removeFromGroupData = {
+    user_to_remove: usersToRemove
+  }
+  try{
+    const removeFromGroupResponse = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/group/" + groupId + "/remove_users",
+      {
+        method: "POST",
+        headers: {
+          'accept': 'application/json',
+          'Authorization': 'Bearer ' + accessToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(removeFromGroupData)
+      });
+
+      const responseData:FilearchAPIResponse<string> = await removeFromGroupResponse.json();
+      return responseData.action_responses;
+  } catch (error) {
+    logger.error("Error removing users from group: " + error);
+    return [
+      {
+        type:ResourceType.GROUP,
+        action:ActionType.REMOVE_USER_FROM_GROUP,
+        data:null,
+        errors:[
+          {
+            error_code:7001,
+            error_message:"Error removing users from group. See logs for details.",
             http_code:500
           }
         ]

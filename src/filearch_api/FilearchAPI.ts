@@ -87,6 +87,14 @@ export interface FilearchGroup extends FilearchAPI_IdObject {
   group_membership_type: FilearchGroupMembershipType;
 }
 
+export interface FilearchGroupMember {
+  user_id: number;
+  username: string;
+  group_id: number;
+  accepted: boolean;
+  group_member_type:FilearchGroupMembershipType;
+}
+
 function aggregateErrorResponseArrays(prevVal: ErrorResponse[] | null | undefined, currVal: ErrorResponse[]|null) {
   if (prevVal === undefined || prevVal === null) {
     return [];
