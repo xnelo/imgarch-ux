@@ -42,7 +42,7 @@ export default function RemoveGroup({selectedGroup, deleteGroupEventComplete}: {
   return(
     <>
     <ActionButtonGeneric 
-      iconName="bi-people"
+      iconName="bi-trash3"
       onClickEvent={handleShow}
       isDisabledCheck={removeGroupDisableCheck}/>
     <Modal show={show} onHide={handleClose}>

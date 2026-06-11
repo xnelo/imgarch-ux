@@ -3,12 +3,14 @@
 import { Suspense, use, useState } from "react";
 import GroupItemView from "./GroupItemView";
 import styles from "./GroupView.module.css"
-import { FilearchGroup } from "@/filearch_api/FilearchAPI";
-import { Button } from "react-bootstrap";
+import { FIlearchAllGroupPermission, FilearchGroup, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType } from "@/filearch_api/FilearchAPI";
+import { Modal } from "react-bootstrap";
 import AddGroup from "./action_buttons/AddGroup";
 import RemoveGroup from "./action_buttons/RemoveGroup";
 import AddPersionToGroup from "./action_buttons/AddPersonToGroup";
 import RemovePersonFromGroup from "./action_buttons/RemovePersonFromGroup";
+import { GetAllUserPermissionsAction, GetCurrentUserId, GetCurrentUserPermissions, GetMembersInGroupAction } from "./actions/GroupActions";
+import MembersModalGroupMembersTable, { MembersModal_CurrentUserInfo, MembersModal_CurrentUserInfoImpl, MembersModal_GroupMemberInfo, MembersModal_GroupMemberInfoImpl } from "./MembersModalGroupMembersTable";
 
 export const NO_GROUP_SELECTED: number = -1;
 
@@ -23,6 +25,19 @@ function findGroupInGroups(groups:FilearchGroup[]|null, groupId:number):Filearch
   } else {
     return retVal;
   }
+}
+
+function combineGroupInfoAndPermissionInfo(groupMembers:FilearchGroupMember[], groupMemberPermissions:FIlearchAllGroupPermission[]) : MembersModal_GroupMemberInfo[] {
+  return groupMembers.map(mem=>{
+    const memberPermissions: FIlearchAllGroupPermission|undefined = groupMemberPermissions.find(perm=>perm.user_id===mem.user_id);
+    return new MembersModal_GroupMemberInfoImpl(
+      mem.user_id, 
+      mem.username, 
+      mem.group_id, 
+      mem.accepted, 
+      mem.group_member_type,
+      memberPermissions===undefined?[]:memberPermissions.permissions);
+  });
 }
 
 export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null>}) {
@@ -68,7 +83,43 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
     }
   }
 
+  const [membersModalGroup, setMembersModalGroup] = useState<FilearchGroup|null>(null);
+  const [membersModalShow, setMembersModalShow] = useState<boolean>(false);
+  const [membersModalMembers, setMembersModalMembers] = useState<MembersModal_GroupMemberInfo[]>([]);
+  const [currentUserPermissionInfo, setCurrentUserPermissionInfo] = useState<MembersModal_CurrentUserInfo|null>(null);
+
+  const handleClose = () => setMembersModalShow(false);
+
+  async function groupMembersModalOpen(groupId:number) : Promise<void> {
+    const currGroup:FilearchGroup|null = findGroupInGroups(allGroups, groupId);
+    const allMembers:FilearchGroupMember[] = await GetMembersInGroupAction(groupId);
+    const allUsersPermissions:FIlearchAllGroupPermission[] = await GetAllUserPermissionsAction(groupId);
+    const finalAllMembers:MembersModal_GroupMemberInfo[] = combineGroupInfoAndPermissionInfo(allMembers, allUsersPermissions);
+    const userPermissions:FilearchGroupPermission[] = await GetCurrentUserPermissions(groupId);
+    const localCurrentUserId:number|null = await GetCurrentUserId();
+    const isGroupOwner:boolean = localCurrentUserId !== null && currGroup !== null && currGroup.owner_user_id === localCurrentUserId;
+    const userPermissionInfo:MembersModal_CurrentUserInfo = new MembersModal_CurrentUserInfoImpl(localCurrentUserId!=null?localCurrentUserId:-1, isGroupOwner, userPermissions);
+    
+    
+    setMembersModalGroup(currGroup);
+    setCurrentUserPermissionInfo(userPermissionInfo);
+    setMembersModalMembers(finalAllMembers);
+    setMembersModalShow(true);
+  }
+
   return (
+      <>
+      <Modal show={membersModalShow} onHide={handleClose} size="xl">
+        <Modal.Header closeButton>
+          <Modal.Title>'{membersModalGroup?.group_name}' Members</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            {membersModalMembers.length <= 0 ? 
+              <span>NO DATA</span> :
+              <MembersModalGroupMembersTable currentUserPermissionInfo={currentUserPermissionInfo} groupMembers={membersModalMembers}/>
+            }
+        </Modal.Body>
+      </Modal>
       <div className='container-fluid'>
         <div className="position-absolute bg-body-tertiary"
           style={{
@@ -94,7 +145,7 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
               <Suspense fallback={<div>Loading...</div>}>
                 {(allGroups === null || allGroups.length <= 0) 
                   ? <div>NO DATA</div>
-                  : <ul className={styles.GroupList}>{allGroups.map(i => <GroupItemView key={i.id} groupInfo={i} selectedGroupId={selectedGroup} selectGroupEvent={selectGroupEvent}/>)}</ul>
+                  : <ul className={styles.GroupList}>{allGroups.map(i => <GroupItemView key={i.id} groupInfo={i} selectedGroupId={selectedGroup} selectGroupEvent={selectGroupEvent} showMembersModal={groupMembersModalOpen}/>)}</ul>
                 }
               </Suspense>
             </div>
@@ -112,5 +163,6 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
           </Suspense>
         </div>
       </div>
+      </>
     );
 }

@@ -1,7 +1,6 @@
 import logger from "@/lib/logger";
-import { ActionResponse, ActionType, FilearchAPIResponse, FilearchGroup, FilearchGroupMember, HandleErrorResponse, ResourceType, SortDirection } from "./FilearchAPI";
+import { ActionResponse, ActionType, FIlearchAllGroupPermission, FilearchAPIResponse, FilearchGroup, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType, HandleErrorResponse, ResourceType, SortDirection } from "./FilearchAPI";
 import { GetAllPaginatedData } from "./FilearchAPI_ServerFunctions";
-import { group } from "console";
 
 const GROUPIN_LIMIT_PER_REQUEST:number = 25;
 
@@ -175,5 +174,94 @@ export async function RemovePeopleFromGroup(accessToken: string, groupId:number,
         ]
       }
     ];
+  }
+}
+
+export async function GetGroupPermissions(accessToken: string, groupId:number, userId:number): Promise<FilearchGroupPermission[]> {
+  let searchParams : URLSearchParams = new URLSearchParams();
+  searchParams.append("user_id", userId.toString());
+  
+  const permissionURL:string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/group/" + groupId + "/permissions" + `?${searchParams.toString()}`;
+
+  try{
+    const getPermissionsResponse = await fetch(permissionURL,
+      {
+        method: 'GET',
+        headers: {
+          'accept': 'application/json',
+          'Authorization': 'Bearer ' + accessToken
+        }
+      });
+    
+    if (getPermissionsResponse.status !== 200) {
+      HandleErrorResponse(await getPermissionsResponse.json());
+      return [];
+    }
+
+    const permissionData:FilearchAPIResponse<FilearchGroupPermission[]> = await getPermissionsResponse.json();
+    if (permissionData.action_responses[0].data === null) {
+      logger.error("Data returned null. Should not happen.");
+      return [];
+    }
+    return permissionData.action_responses[0].data;
+  } catch (error) {
+    logger.error("Error getting permissions " + error);
+    return [];
+  }
+}
+
+export async function GetAllUserPermissionsForGroup(accessToken: string, groupId:number): Promise<FIlearchAllGroupPermission[]> {
+  try{
+    const getPermissionsResponse = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/group/" + groupId + "/all_user_permissions",
+      {
+        method: "GET",
+        headers: {
+          'accept': 'application/json',
+          'Authorization': 'Bearer ' + accessToken
+        }
+      });
+    
+    if (getPermissionsResponse.status !== 200) {
+      HandleErrorResponse(await getPermissionsResponse.json());
+      return [];
+    }
+
+    const userPermissions:FilearchAPIResponse<FIlearchAllGroupPermission[]> = await getPermissionsResponse.json();
+    if (userPermissions.action_responses[0].data === null) {
+      logger.error("No data returned. This should not happen.");
+      return [];
+    }
+    return userPermissions.action_responses[0].data;
+  } catch (error) {
+    logger.error("Error getting permissions for users " + error);
+    return [];
+  }
+}
+
+export async function ModifyPermission(accessToken: string, groupId:number, userId:number, permission:FilearchGroupPermissionType, removePermission:boolean) : Promise<ActionResponse<FilearchGroupPermission>[]> {
+  const modifyPermissionData = [{
+    action: (removePermission ? "REMOVE" : "ADD"),
+    user_id: userId,
+    permission: permission
+  }];
+
+  try {
+    const modifyPermissionResponse = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/group/" + groupId + "/permissions",
+      {
+        method: "POST",
+        headers: {
+          'accept': 'application/json',
+          'Authorization': 'Bearer ' + accessToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(modifyPermissionData)
+      }
+    );
+
+    const data = await modifyPermissionResponse.json()
+    return data.action_responses;
+  } catch(error) {
+    logger.error("Error modifying user permission: " + error);
+    return [];
   }
 }

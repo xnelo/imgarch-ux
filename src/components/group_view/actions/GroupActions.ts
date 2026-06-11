@@ -1,7 +1,7 @@
 'use server'
 
-import { ActionResponse, FilearchGroupMember } from "@/filearch_api/FilearchAPI";
-import { AddPeopleToGroup, CreateNewGroup, DeleteGroup, GetMembersInGroup, RemovePeopleFromGroup } from "@/filearch_api/group";
+import { ActionResponse, FIlearchAllGroupPermission, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType } from "@/filearch_api/FilearchAPI";
+import { AddPeopleToGroup, CreateNewGroup, DeleteGroup, GetAllUserPermissionsForGroup, GetGroupPermissions, GetMembersInGroup, ModifyPermission, RemovePeopleFromGroup } from "@/filearch_api/group";
 import { getSession } from "@/lib/lib";
 import logger from "@/lib/logger";
 import { group } from "console";
@@ -64,4 +64,60 @@ export async function RemoveUsersFromGroupAction(groupId:number, usersToRemove:s
   }
 
   return await RemovePeopleFromGroup(session.access_token, groupId, usersToRemove);
+}
+
+export async function GetCurrentUserPermissions(groupId:number):Promise<FilearchGroupPermission[]> {
+  logger.debug("Getting current users permission for group. group_id=" + groupId);
+
+  const session = await getSession();
+  if (session.access_token === undefined) {
+    logger.error("Error getting access token for session.");
+    return [];
+  }
+
+  if (session.userInfo === undefined || session.userInfo.registration_info === undefined) {
+    logger.error("User information is undefined.");
+    return [];
+  }
+
+  return await GetGroupPermissions(session.access_token, groupId, session.userInfo.registration_info.user_id);
+}
+
+export async function GetCurrentUserId():Promise<number|null> {
+   const session = await getSession();
+  if (session.access_token === undefined) {
+    logger.error("Error getting access token for session.");
+    return null;
+  }
+
+  if (session.userInfo === undefined || session.userInfo.registration_info === undefined) {
+    logger.error("User information is undefined.");
+    return null;
+  }
+
+  return session.userInfo.registration_info.user_id;
+}
+
+export async function GetAllUserPermissionsAction(groupId:number) : Promise<FIlearchAllGroupPermission[]> {
+  logger.debug("Getting all user permissions for group. group_id=" + groupId);
+
+  const session = await getSession();
+  if (session.access_token === undefined) {
+    logger.error("Error getting access token for session.");
+    return [];
+  }
+
+  return await GetAllUserPermissionsForGroup(session.access_token, groupId);
+}
+
+export async function ModifyUserPermissionAction(groupId:number, userId:number, permission:FilearchGroupPermissionType, removePermission:boolean) : Promise<ActionResponse<FilearchGroupPermission>[]> {
+  logger.debug("Modifying user permission. groupId=" + groupId + " userId=" + userId + " permission=" + permission + " removePermission=" + removePermission);
+
+  const session = await getSession();
+  if (session.access_token === undefined) {
+    logger.error("Error getting access token for session.");
+    return [];
+  }
+
+  return await ModifyPermission(session.access_token, groupId, userId, permission, removePermission);
 }

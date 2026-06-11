@@ -38,6 +38,24 @@ export enum SortDirection {
   DESCENDING = "DESCENDING"
 }
 
+export enum FilearchGroupMembershipType {
+  OWNER = 'OWNER',
+  ADMIN = 'ADMIN',
+  MEMBER = 'MEMBER'
+}
+
+export enum FilearchGroupPermissionType {
+  UNKNOWN = 'UNKNOWN',
+  ADMIN = 'ADMIN',
+  ADD_MEMBERS = 'ADD_MEMBERS',
+  REMOVE_MEMBERS = 'REMOVE_MEMBERS',
+  EDIT_MEMBER_PERMISSIONS = 'EDIT_MEMBER_PERMISSIONS',
+  ADD_ITEMS = 'ADD_ITEMS',
+  REMOVE_ITEMS = 'REMOVE_ITEMS',
+  TAG_ITEMS = 'TAG_ITEMS',
+  REMOVE_TAGS = 'REMOVE_TAGS'
+}
+
 export interface FilearchAPI_IdObject{
   id: number;
 }
@@ -64,22 +82,6 @@ export interface FilearchAPIResponse<T> {
   action_responses: ActionResponse<T>[];
 }
 
-export function HandleActionResponse<T>(actionResponse: ActionResponse<T>) : void {
-    actionResponse.errors!.forEach((error:ErrorResponse) => {
-                    console.error("Error response from API: ", error);
-                });
-}
-
-export function HandleErrorResponse<T>(apiResponse: FilearchAPIResponse<T>) : void {
-    apiResponse.action_responses.forEach(HandleActionResponse)
-}
-
-export enum FilearchGroupMembershipType {
-  OWNER = 'OWNER',
-  ADMIN = 'ADMIN',
-  MEMBER = 'MEMBER'
-}
-
 export interface FilearchGroup extends FilearchAPI_IdObject {
   owner_user_id: number;
   group_name: string;
@@ -93,6 +95,28 @@ export interface FilearchGroupMember {
   group_id: number;
   accepted: boolean;
   group_member_type:FilearchGroupMembershipType;
+}
+
+export interface FilearchGroupPermission {
+  user_id: number;
+  group_id: number;
+  permission: FilearchGroupPermissionType;
+}
+
+export interface FIlearchAllGroupPermission {
+  user_id: number;
+  group_id: number;
+  permissions: FilearchGroupPermissionType[];
+}
+
+export function HandleActionResponse<T>(actionResponse: ActionResponse<T>) : void {
+    actionResponse.errors!.forEach((error:ErrorResponse) => {
+                    console.error("Error response from API: ", error);
+                });
+}
+
+export function HandleErrorResponse<T>(apiResponse: FilearchAPIResponse<T>) : void {
+    apiResponse.action_responses.forEach(HandleActionResponse)
 }
 
 function aggregateErrorResponseArrays(prevVal: ErrorResponse[] | null | undefined, currVal: ErrorResponse[]|null) {

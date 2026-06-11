@@ -32,7 +32,7 @@ export default function AddGroup({addGroupEventComplete}: {addGroupEventComplete
   return(
     <>
     <ActionButtonGeneric
-      iconName="bi-people-fill"
+      iconName="bi-plus"
       onClickEvent={handleShow}/>
 
     <Modal show={show} onHide={handleClose}>

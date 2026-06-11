@@ -1,6 +1,6 @@
 .GroupList {
   list-style-type: none;
-  border-left: var(--bs-gray-600) 1px solid;
+  border-left: 1px solid var(--bs-gray-600);
   margin-left: 0.3rem;
   padding-left: 0.3rem;
 }
@@ -20,7 +20,7 @@
 .GroupName {
   cursor: pointer;
   text-decoration: none;
-  width: 70%;
+  width: 65%;
   display: inline-flex;
   overflow: hidden;
   margin: 1px;
@@ -31,4 +31,81 @@
   text-decoration: underline;
   margin: 0px;
   border: var(--bs-link-hover-color) 1px dotted;
+}
+
+.GroupItemMembersButton {
+  font-size: .75em;
+  padding: 0px;
+  width: 2em;
+  margin: 1px;
+  border-radius: 25px;
+}
+
+.GroupItemMembersButton:hover {
+  background-color: var(--bs-primary-bg-subtle);
+}
+
+.GroupMemberList {
+  list-style-type: none;
+  margin-left: 0.3rem;
+  padding-left: 0.3rem;
+}
+
+.MembersTableContainer {
+  height: 25vh;
+  overflow: scroll;
+}
+
+.MembersTableContainer thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #fff; /* Prevents underlying body text from showing through */
+}
+
+.MembersTableContainer th:first-child,
+.MembersTableContainer td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background-color: #fff; /* Prevents underlying body text from showing through */
+}
+
+.MembersTableContainer thead th:first-child {
+  z-index: 11;
+}
+
+.MembersTableContainer th, .MembersTableContainer td {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-bottom: 1px solid var(--bs-gray-600);
+}
+
+.rotate_image {
+  -webkit-animation:spin 4s linear infinite;
+  -moz-animation:spin 4s linear infinite;
+  animation:spin 4s linear infinite;
+}
+@-moz-keyframes spin { 
+    100% { -moz-transform: rotate(360deg); } 
+}
+@-webkit-keyframes spin { 
+    100% { -webkit-transform: rotate(360deg); } 
+}
+@keyframes spin { 
+    100% { 
+        -webkit-transform: rotate(360deg); 
+        transform:rotate(360deg); 
+    } 
+}
+
+.DeleteUserAnchor {
+  text-decoration: none;
+}
+
+.DeleteUserAnchor:hover {
+  text-decoration: underline;
+  cursor: pointer;
 }
