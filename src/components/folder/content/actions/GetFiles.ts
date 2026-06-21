@@ -1,7 +1,7 @@
 'use server'
 
-import { PaginationContract } from "@/filearch_api/FilearchAPI";
-import { FilearchFile, GetPaginatedFiles } from "@/filearch_api/files";
+import { FilearchFile, PaginationContract } from "@/filearch_api/FilearchAPI";
+import { GetPaginatedFiles } from "@/filearch_api/files";
 import { getSession } from "@/lib/lib";
 import logger from "@/lib/logger";
 

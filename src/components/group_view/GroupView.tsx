@@ -3,14 +3,15 @@
 import { Suspense, use, useState } from "react";
 import GroupItemView from "./GroupItemView";
 import styles from "./GroupView.module.css"
-import { FIlearchAllGroupPermission, FilearchGroup, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType } from "@/filearch_api/FilearchAPI";
+import { FIlearchAllGroupPermission, FilearchGroup, FilearchGroupFile, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType, PaginationContract } from "@/filearch_api/FilearchAPI";
 import { Modal } from "react-bootstrap";
 import AddGroup from "./action_buttons/AddGroup";
 import RemoveGroup from "./action_buttons/RemoveGroup";
 import AddPersionToGroup from "./action_buttons/AddPersonToGroup";
 import RemovePersonFromGroup from "./action_buttons/RemovePersonFromGroup";
-import { GetAllUserPermissionsAction, GetCurrentUserId, GetCurrentUserPermissions, GetMembersInGroupAction } from "./actions/GroupActions";
+import { GetAllUserPermissionsAction, GetCurrentUserId, GetCurrentUserPermissions, GetGroupFiles, GetMembersInGroupAction } from "./actions/GroupActions";
 import MembersModalGroupMembersTable, { MembersModal_CurrentUserInfo, MembersModal_CurrentUserInfoImpl, MembersModal_GroupMemberInfo, MembersModal_GroupMemberInfoImpl } from "./MembersModalGroupMembersTable";
+import FilesViewer from "../file_viewer/FilesViewer";
 
 export const NO_GROUP_SELECTED: number = -1;
 
@@ -51,14 +52,17 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
   let [allGroups, setAllGroups] = useState<FilearchGroup[] | null>(tmpAllGroups);
   let [selectedGroup, setSelectedGroup] = useState<number>(NO_GROUP_SELECTED);
   let [selectedGroupData, setSelectedGroupData] = useState<FilearchGroup|null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
   function selectGroupEvent(groupSelectedId:number):void {
     if (groupSelectedId === selectedGroup) {
       setSelectedGroup(NO_GROUP_SELECTED);
       setSelectedGroupData(null);
+      setRefreshTrigger(prev => prev + 1);
     } else {
       setSelectedGroup(groupSelectedId);
       setSelectedGroupData(findGroupInGroups(allGroups, groupSelectedId));
+      setRefreshTrigger(prev => prev + 1);
     }
   }
 
@@ -80,6 +84,7 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
       setAllGroups(allGroups.filter(a => a.id !== deletedGroup.id));
       setSelectedGroup(NO_GROUP_SELECTED);
       setSelectedGroupData(null);
+      setRefreshTrigger(prev => prev + 1);
     }
   }
 
@@ -105,6 +110,14 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
     setCurrentUserPermissionInfo(userPermissionInfo);
     setMembersModalMembers(finalAllMembers);
     setMembersModalShow(true);
+  }
+
+  async function GetGroupFiles_Internal(afterId: number | null) : Promise<PaginationContract<FilearchGroupFile>|null> {
+    if (selectedGroup === NO_GROUP_SELECTED) {
+      return null;
+    } else {
+      return await GetGroupFiles(selectedGroup, afterId);
+    }
   }
 
   return (
@@ -159,7 +172,14 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
             left: '25vw'
           }}>
           <Suspense fallback={<div>Loading...</div>}>
-            <span>Coming Soon</span>
+            <FilesViewer
+              getFileFunction={GetGroupFiles_Internal}
+              refreshTrigger={refreshTrigger}
+              style={{
+                height: 'calc(100vh - 5.75rem)', 
+                width: '100%', 
+                paddingLeft: '1vw'}}
+              />
           </Suspense>
         </div>
       </div>

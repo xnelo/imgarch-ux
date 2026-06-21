@@ -38,6 +38,11 @@ export enum SortDirection {
   DESCENDING = "DESCENDING"
 }
 
+export enum GroupItemType {
+  FOLDER = 'FOLDER',
+  FILE = 'FILE'
+}
+
 export enum FilearchGroupMembershipType {
   OWNER = 'OWNER',
   ADMIN = 'ADMIN',
@@ -80,6 +85,20 @@ export interface ActionResponse<T> {
 
 export interface FilearchAPIResponse<T> {
   action_responses: ActionResponse<T>[];
+}
+
+export interface FilearchFile extends FilearchAPI_IdObject {
+  owner_id: number;
+  folder_id: number;
+  storage_type: StorageType;
+  storage_key: string;
+  original_filename: string;
+  mime_type: string;
+}
+
+export interface FilearchGroupFile extends FilearchFile {
+  item_type: GroupItemType;
+  folder_in: string;
 }
 
 export interface FilearchGroup extends FilearchAPI_IdObject {

@@ -6,8 +6,7 @@ import { DownloadThumbnail } from "./actions/DownloadImage";
 import styles from "./FileViewer.module.css";
 import { Button } from "react-bootstrap";
 import { DeleteFileAction } from "./actions/DeleteFile";
-import { FilearchFile } from "@/filearch_api/files";
-import { ActionResponse, ErrorResponse } from "@/filearch_api/FilearchAPI";
+import { ActionResponse, ErrorResponse, FilearchFile } from "@/filearch_api/FilearchAPI";
 import toast from "react-hot-toast";
 
 export default function FileItemView({ fileData, deleteEventCompleteCallback, showSelectedImageCallback }: { fileData: FileItem, deleteEventCompleteCallback: (deletedId: number) => void, showSelectedImageCallback: (selectedImage: FileItem) => void}) {

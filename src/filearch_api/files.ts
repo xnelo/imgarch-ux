@@ -1,15 +1,6 @@
 import logger from "@/lib/logger";
-import { ActionResponse, ActionType, FilearchAPI_IdObject, FilearchAPIResponse, PaginationContract, ResourceType, SortDirection, StorageType } from "./FilearchAPI";
+import { ActionResponse, FilearchAPIResponse, FilearchFile, PaginationContract, ResourceType, SortDirection, StorageType } from "./FilearchAPI";
 import { logActionResponseErrors, MakeAPICall, SinglePaginatedCall } from "./FilearchAPI_ServerFunctions";
-
-export interface FilearchFile extends FilearchAPI_IdObject {
-  owner_id: number;
-  folder_id: number;
-  storage_type: StorageType;
-  storage_key: string;
-  original_filename: string;
-  mime_type: string;
-}
 
 export async function GetPaginatedSearchFiles(
   accessToken:string, 

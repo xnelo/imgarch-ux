@@ -1,10 +1,9 @@
 'use server'
 
-import { ActionResponse, FIlearchAllGroupPermission, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType } from "@/filearch_api/FilearchAPI";
-import { AddPeopleToGroup, CreateNewGroup, DeleteGroup, GetAllUserPermissionsForGroup, GetGroupPermissions, GetMembersInGroup, ModifyPermission, RemovePeopleFromGroup } from "@/filearch_api/group";
+import { ActionResponse, FIlearchAllGroupPermission, FilearchGroupFile, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType, PaginationContract } from "@/filearch_api/FilearchAPI";
+import { AddPeopleToGroup, CreateNewGroup, DeleteGroup, GetAllUserPermissionsForGroup, GetGroupPermissions, GetMembersInGroup, GetPaginatedGroupFiles, ModifyPermission, RemovePeopleFromGroup } from "@/filearch_api/group";
 import { getSession } from "@/lib/lib";
 import logger from "@/lib/logger";
-import { group } from "console";
 
 export async function CreateGroup(group_name: string) {
   logger.debug("Adding group with name " + group_name);
@@ -120,4 +119,16 @@ export async function ModifyUserPermissionAction(groupId:number, userId:number, 
   }
 
   return await ModifyPermission(session.access_token, groupId, userId, permission, removePermission);
+}
+
+export async function GetGroupFiles(groupId:number, afterId: number|null): Promise<PaginationContract<FilearchGroupFile> | null> {
+  logger.debug("Getting all files in group. group_id=" + groupId);
+
+  const session = await getSession();
+  if (session.access_token === undefined) {
+    logger.error("Error getting access token for session.");
+    return null;
+  }
+
+  return await GetPaginatedGroupFiles(session.access_token, groupId, afterId, 20);
 }

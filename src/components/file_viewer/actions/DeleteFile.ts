@@ -1,7 +1,7 @@
 'use server'
 
-import { ActionResponse } from "@/filearch_api/FilearchAPI";
-import { DeleteFile, FilearchFile } from "@/filearch_api/files";
+import { ActionResponse, FilearchFile } from "@/filearch_api/FilearchAPI";
+import { DeleteFile } from "@/filearch_api/files";
 import { getSession } from "@/lib/lib";
 import logger from "@/lib/logger";
 

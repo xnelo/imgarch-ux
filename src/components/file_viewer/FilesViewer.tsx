@@ -3,8 +3,7 @@ import { FileItem } from "./FileItem";
 import FileItemView from "./FileItemView";
 import { useInView } from "react-intersection-observer";
 import FileViewer from "./FileViewer";
-import { PaginationContract } from "@/filearch_api/FilearchAPI";
-import { FilearchFile } from "@/filearch_api/files";
+import { FilearchFile, PaginationContract } from "@/filearch_api/FilearchAPI";
 
 function removeFile(currData: FileItem[], deletedId: number): FileItem[] {
   const newArray: FileItem[] = [];

@@ -1,6 +1,6 @@
 import logger from "@/lib/logger";
-import { ActionResponse, ActionType, FIlearchAllGroupPermission, FilearchAPIResponse, FilearchGroup, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType, HandleErrorResponse, ResourceType, SortDirection } from "./FilearchAPI";
-import { GetAllPaginatedData } from "./FilearchAPI_ServerFunctions";
+import { ActionResponse, ActionType, FIlearchAllGroupPermission, FilearchAPIResponse, FilearchGroup, FilearchGroupFile, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType, HandleErrorResponse, PaginationContract, ResourceType, SortDirection } from "./FilearchAPI";
+import { GetAllPaginatedData, logActionResponseErrors, SinglePaginatedCall } from "./FilearchAPI_ServerFunctions";
 
 const GROUPIN_LIMIT_PER_REQUEST:number = 25;
 
@@ -264,4 +264,24 @@ export async function ModifyPermission(accessToken: string, groupId:number, user
     logger.error("Error modifying user permission: " + error);
     return [];
   }
+}
+
+export async function GetPaginatedGroupFiles(
+  accessToken: string,
+  groupId: number,
+  afterId: number|null,
+  limit: number) : Promise<PaginationContract<FilearchGroupFile> | null> {
+    const data: ActionResponse<PaginationContract<FilearchGroupFile>> = 
+      await SinglePaginatedCall<FilearchGroupFile>(
+        accessToken,
+        process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/group/" + groupId + "/files",
+        afterId,
+        SortDirection.ASCENDING,
+        limit,
+        ResourceType.GROUP);
+    if (data.errors !== null && data.errors.length > 0) {
+      logActionResponseErrors(data);
+      return null;
+    }
+    return data.data;
 }

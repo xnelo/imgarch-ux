@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import FilesViewer from "../file_viewer/FilesViewer";
-import { FilearchFile } from "@/filearch_api/files";
-import { PaginationContract } from "@/filearch_api/FilearchAPI";
+import { FilearchFile, PaginationContract } from "@/filearch_api/FilearchAPI";
 import { SearchFiles } from "./actions/SearchFiles";
 
 export default function FileSearch() {
