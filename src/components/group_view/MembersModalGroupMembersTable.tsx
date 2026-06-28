@@ -152,32 +152,12 @@ function MembersModalGroupMemberItemView({memberInfo, currentUserId, canEditUser
       () => deleteUser(username)
     );
   };
-  /*
-  const { openDialog, closeDialog } = useDialog();
-  const handleRemoveClicked = (username:string) => {
-
-    const yesClicked = () => {
-      closeDialog();
-      deleteUser(username);
-    }
-
-    openDialog("Are You Sure?",
-      <div>
-        <p className="text-gray-600 dark:text-gray-300">
-          Do you really want to remove <b>{username}</b>?
-        </p>
-        <button onClick={yesClicked}>Yes</button>
-        <button onClick={closeDialog}>No</button>
-      </div>
-    );
-  };
-  */
   
  return (
     <tr>
       <td>{memberInfo.username}</td>
       {canEditUserPermissions && editablePermissions.map(p=><td key={`permission_${memberInfo.userId}_${p}`}><MembersModalMemberPermissionCheckbox memberInfo={memberInfo} permissionFor={p} disabled={memberIsCurrentUser}/></td>)}
-      {canRemoveUser &&<td>{!memberIsCurrentUser && <a className={styles.DeleteUserAnchor} onClick={() => handleRemoveClicked(memberInfo.username)} >Remove</a>}</td>}
+      {canRemoveUser &&<td>{!memberIsCurrentUser && <a className={styles.DefaultAnchor} onClick={() => handleRemoveClicked(memberInfo.username)} >Remove</a>}</td>}
     </tr>
   );
 }

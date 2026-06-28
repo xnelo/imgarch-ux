@@ -2,7 +2,7 @@
 
 import { Suspense, use, useState } from "react";
 import GroupItemView from "./GroupItemView";
-import styles from "./GroupView.module.css"
+import styles from "./GroupView.module.css";
 import { FIlearchAllGroupPermission, FilearchGroup, FilearchGroupFile, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType, PaginationContract } from "@/filearch_api/FilearchAPI";
 import { Modal } from "react-bootstrap";
 import AddGroup from "./action_buttons/AddGroup";
@@ -175,6 +175,7 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
             <FilesViewer
               getFileFunction={GetGroupFiles_Internal}
               refreshTrigger={refreshTrigger}
+              groupViewId={selectedGroup}
               style={{
                 height: 'calc(100vh - 5.75rem)', 
                 width: '100%', 

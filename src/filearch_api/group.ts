@@ -1,6 +1,7 @@
 import logger from "@/lib/logger";
-import { ActionResponse, ActionType, FIlearchAllGroupPermission, FilearchAPIResponse, FilearchGroup, FilearchGroupFile, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType, HandleErrorResponse, PaginationContract, ResourceType, SortDirection } from "./FilearchAPI";
+import { ActionResponse, ActionType, FIlearchAllGroupPermission, FilearchAPIResponse, FilearchGroup, FilearchGroupFile, FilearchGroupItem, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType, GroupItemType, HandleActionResponse, HandleErrorResponse, PaginationContract, ResourceType, SortDirection } from "./FilearchAPI";
 import { GetAllPaginatedData, logActionResponseErrors, SinglePaginatedCall } from "./FilearchAPI_ServerFunctions";
+import { log } from "console";
 
 const GROUPIN_LIMIT_PER_REQUEST:number = 25;
 
@@ -284,4 +285,45 @@ export async function GetPaginatedGroupFiles(
       return null;
     }
     return data.data;
+}
+
+export async function RemoveGroupItem(accessToken:string, groupId:number, itemId:number, itemType:GroupItemType) : Promise<boolean> {
+  const bodyData = {remove_items:[{item_id:itemId, item_type:itemType}]};
+
+  try{
+    const resp = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/group/" + groupId + "/remove_items",
+        {
+          method: "POST",
+          headers: {
+            'accept': 'application/json',
+            'Authorization': 'Bearer ' + accessToken,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(bodyData)
+        }
+      );
+    
+    if (resp.status != 200) {
+      HandleErrorResponse(await resp.json());
+      return false;
+    }
+
+    const respData = await resp.json();
+    const ar: ActionResponse<FilearchGroupItem> = respData.action_responses[0];
+    if (ar.errors !== null && ar.errors.length > 0) {
+      HandleActionResponse(ar);
+      return false;
+    }
+
+    if (ar.data === null) {
+      // This should never happen
+      logger.error("No Data returned for group remove item.");
+      return false;
+    }
+
+    return ar.data.item_id == itemId;
+  } catch(error) {
+    logger.error("Error removing item from group. " + error);
+    return false;
+  }
 }

@@ -99,6 +99,7 @@ export interface FilearchFile extends FilearchAPI_IdObject {
 export interface FilearchGroupFile extends FilearchFile {
   item_type: GroupItemType;
   folder_in: string;
+  folder_in_id: number|null;
 }
 
 export interface FilearchGroup extends FilearchAPI_IdObject {
@@ -126,6 +127,12 @@ export interface FIlearchAllGroupPermission {
   user_id: number;
   group_id: number;
   permissions: FilearchGroupPermissionType[];
+}
+
+export interface FilearchGroupItem {
+  item_id: number;
+  item_type: GroupItemType;
+  group_id: number;
 }
 
 export function HandleActionResponse<T>(actionResponse: ActionResponse<T>) : void {

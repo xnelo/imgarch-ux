@@ -67,7 +67,7 @@
 .MembersTableContainer td:first-child {
   position: sticky;
   left: 0;
-  z-index: 3;
+  z-index: 9;
   background-color: #fff; /* Prevents underlying body text from showing through */
 }
 
@@ -101,11 +101,11 @@
     } 
 }
 
-.DeleteUserAnchor {
+.DefaultAnchor {
   text-decoration: none;
 }
 
-.DeleteUserAnchor:hover {
+.DefaultAnchor:hover {
   text-decoration: underline;
   cursor: pointer;
 }

@@ -24,7 +24,7 @@
   top:0.25rem;
   left:15.66rem;
   background:none;
-  z-index: 9999;
+  z-index: 5;
 }
 
 .fileitem_deletebutton:hover {
@@ -70,4 +70,40 @@
 .folderView_tag:hover > a:hover {
   color: var(--bs-secondary) !important;
   cursor: pointer;
+}
+
+.folderView_defaultAnchor {
+  text-decoration: none;
+}
+
+.folderView_defaultAnchor:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.folderItem_removeGroupFolder_dash {
+  font-size: 0.75rem;
+  padding: 0px;
+  margin: 0px;
+  position: relative;
+  top: -2px;
+  left: 1px;
+}
+
+.folderItem_removeGroupFolder {
+  position: relative;
+  border-radius: 20px;
+  width: 20px;
+  height: 20px;
+  padding: 0px;
+  top: 0.15rem;
+  left: 0.15rem;
+  background: none;
+  float: left;
+}
+
+.folderItem_removeGroupFolder:hover {
+  background: fixed;
+  background-color: var(--bs-secondary);
+  color: var(--bs-primary);
 }
