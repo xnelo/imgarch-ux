@@ -1,7 +1,7 @@
 'use server'
 
-import { ActionResponse, FIlearchAllGroupPermission, FilearchGroupFile, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType, PaginationContract } from "@/filearch_api/FilearchAPI";
-import { AddPeopleToGroup, CreateNewGroup, DeleteGroup, GetAllUserPermissionsForGroup, GetGroupPermissions, GetMembersInGroup, GetPaginatedGroupFiles, ModifyPermission, RemovePeopleFromGroup } from "@/filearch_api/group";
+import { ActionResponse, FIlearchAllGroupPermission, FilearchGroupFile, FilearchGroupItem, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType, PaginationContract } from "@/filearch_api/FilearchAPI";
+import { AddGroupItems, AddPeopleToGroup, CreateNewGroup, DeleteGroup, GetAllUserPermissionsForGroup, GetGroupPermissions, GetMembersInGroup, GetPaginatedGroupFiles, ModifyPermission, RemovePeopleFromGroup } from "@/filearch_api/group";
 import { getSession } from "@/lib/lib";
 import logger from "@/lib/logger";
 
@@ -131,4 +131,18 @@ export async function GetGroupFiles(groupId:number, afterId: number|null): Promi
   }
 
   return await GetPaginatedGroupFiles(session.access_token, groupId, afterId, 20);
+}
+
+export async function AddGroupItemsAction(
+  groupId:number, 
+  itemsToAdd:FilearchGroupItem[] | null): Promise<ActionResponse<FilearchGroupItem>[] | null> {
+  logger.debug("Adding items to group. group_id=" + groupId + " itemsToAdd="+itemsToAdd);
+
+  const session = await getSession();
+  if (session.access_token === undefined) {
+    logger.error("Error getting access token for session.");
+    return null;
+  }
+
+  return await AddGroupItems(session.access_token, groupId, itemsToAdd);
 }

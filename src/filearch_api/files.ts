@@ -26,6 +26,26 @@ export async function GetPaginatedSearchFiles(
   return data.data;
 }
 
+export async function GetPaginatedAllFiles(
+  accessToken:string,
+  afterId:number|null,
+  limit:number): Promise<PaginationContract<FilearchFile> | null> {
+    const data: ActionResponse<PaginationContract<FilearchFile>> = 
+      await SinglePaginatedCall<FilearchFile>(
+        accessToken,
+        process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file",
+        afterId,
+        SortDirection.ASCENDING,
+        limit,
+        ResourceType.FILE);
+    
+    if (data.errors !== null && data.errors.length > 0) {
+      logActionResponseErrors(data);
+      return null;
+    }
+    return data.data;
+  }
+
 export async function GetPaginatedFiles(
     accessToken:string, 
     folderId:number, 

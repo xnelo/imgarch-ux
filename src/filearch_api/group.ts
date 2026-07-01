@@ -327,3 +327,39 @@ export async function RemoveGroupItem(accessToken:string, groupId:number, itemId
     return false;
   }
 }
+
+export async function AddGroupItems(
+  accessToken:string,
+  groupId:number,
+  itemsToAdd:FilearchGroupItem[] | null): Promise<ActionResponse<FilearchGroupItem>[] | null> {
+    if (itemsToAdd === null || itemsToAdd.length <= 0) {
+      logger.warn("No items to add to group. Skipping.");
+      return null;
+    }  
+
+    const bodyData = {add_items:itemsToAdd};
+    try {
+      const resp = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/group/" + groupId + "/add_items",
+          {
+            method: "POST",
+            headers: {
+              'accept': 'application/json',
+              'Authorization': 'Bearer ' + accessToken,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bodyData)
+          }
+        );
+      
+      if (resp.status != 200 && resp.status != 400) {
+        logger.error("Error (" + resp.status + ") with call to add group items.");
+        return null;
+      }
+
+      const respData: FilearchAPIResponse<FilearchGroupItem> = await resp.json();
+      return respData.action_responses;
+    } catch (error) {
+      logger.error("Error adding items to group. " + error);
+      return null;
+    }
+  }

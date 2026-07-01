@@ -78,7 +78,7 @@ export default function FileItemView(
       toast.error("Group Id is not defined. Contact support.");
       return;
     }
-    alert("removing item(" + fileData.id + ") from group(" + groupViewId + ")");
+    
     const successfullyRemoved:boolean = await RemoveItemFromGroupAction(groupViewId, fileData.id, GroupItemType.FILE);
     if (!successfullyRemoved) {
       toast.error("Error removing file '" + fileData.originalFilename + "'(" + fileData.id + ") from group.");

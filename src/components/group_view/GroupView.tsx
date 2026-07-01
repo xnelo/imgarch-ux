@@ -3,15 +3,18 @@
 import { Suspense, use, useState } from "react";
 import GroupItemView from "./GroupItemView";
 import styles from "./GroupView.module.css";
-import { FIlearchAllGroupPermission, FilearchGroup, FilearchGroupFile, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType, PaginationContract } from "@/filearch_api/FilearchAPI";
-import { Modal } from "react-bootstrap";
+import { ConcatenateErrorResponse, FIlearchAllGroupPermission, FilearchGroup, FilearchGroupFile, FilearchGroupItem, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType, GroupItemType, PaginationContract } from "@/filearch_api/FilearchAPI";
+import { Button, Modal, Tab, Tabs } from "react-bootstrap";
 import AddGroup from "./action_buttons/AddGroup";
 import RemoveGroup from "./action_buttons/RemoveGroup";
 import AddPersionToGroup from "./action_buttons/AddPersonToGroup";
 import RemovePersonFromGroup from "./action_buttons/RemovePersonFromGroup";
-import { GetAllUserPermissionsAction, GetCurrentUserId, GetCurrentUserPermissions, GetGroupFiles, GetMembersInGroupAction } from "./actions/GroupActions";
+import { AddGroupItemsAction, GetAllUserPermissionsAction, GetCurrentUserId, GetCurrentUserPermissions, GetGroupFiles, GetMembersInGroupAction } from "./actions/GroupActions";
 import MembersModalGroupMembersTable, { MembersModal_CurrentUserInfo, MembersModal_CurrentUserInfoImpl, MembersModal_GroupMemberInfo, MembersModal_GroupMemberInfoImpl } from "./MembersModalGroupMembersTable";
 import FilesViewer from "../file_viewer/FilesViewer";
+import FileList from "../file_list/FileList";
+import toast from "react-hot-toast";
+import FolderList from "../folder_list/FolderList";
 
 export const NO_GROUP_SELECTED: number = -1;
 
@@ -120,6 +123,76 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
     }
   }
 
+  const [addItemModalShow, setAddItemModalShow] = useState<boolean>(false);
+  const [itemsToAdd, setItemsToAdd] = useState<FilearchGroupItem[]>([]);
+
+  const handleShowAddItemModal = () => {
+    setItemsToAdd([]);
+    setAddItemModalShow(true);
+  };
+
+  const handleCloseAddItemModal = () => setAddItemModalShow(false);
+
+  const addItemsToGroup = async () => {
+    handleCloseAddItemModal();
+
+    try{
+      const toAddResults = await AddGroupItemsAction(selectedGroup, itemsToAdd);
+
+      if (toAddResults === null || toAddResults.length <= 0) {
+        toast.error("No items added. Contact support.");
+      } else {
+        toAddResults.forEach(res => {
+          if (res.errors !== null && res.errors.length > 0) {
+            toast.error(ConcatenateErrorResponse(res.errors));
+          } else {
+            toast.success(res.data?.item_type + " " + res.data?.item_id + " added to group " + res.data?.group_id);
+            setRefreshTrigger(o=>o+1);
+          }
+        });
+      }
+    } catch(error) {
+      toast.error("Error while adding items to group. Contact support.");
+    }
+  };
+
+  const handleFileSelectionChanged = (fileId:number, added:boolean) => {
+    if (added) {
+      // add
+      setItemsToAdd(existingItemsToAdd => 
+      [...existingItemsToAdd, 
+        {
+          item_id:fileId, 
+          item_type:GroupItemType.FILE, 
+          group_id:selectedGroup
+        }
+      ]);
+    } else {
+      // remove
+      setItemsToAdd(
+        itemsToAdd.filter(i=>
+          !(i.item_id == fileId 
+          && i.item_type == GroupItemType.FILE)));
+    }
+  };
+
+  const handleFolderSelectionChanged = (folderId:number, added:boolean) => {
+    if (added) {
+      setItemsToAdd(existingItemsToAdd => 
+        [...existingItemsToAdd,
+          {
+            item_id:folderId,
+            item_type:GroupItemType.FOLDER,
+            group_id:selectedGroup
+          }
+        ]);
+    } else {
+      setItemsToAdd(itemsToAdd.filter(i=>
+        !(i.item_id == folderId 
+          && i.item_type == GroupItemType.FOLDER)));
+    }
+  };
+
   return (
       <>
       <Modal show={membersModalShow} onHide={handleClose} size="xl">
@@ -132,6 +205,27 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
               <MembersModalGroupMembersTable currentUserPermissionInfo={currentUserPermissionInfo} groupMembers={membersModalMembers}/>
             }
         </Modal.Body>
+      </Modal>
+      <Modal show={addItemModalShow} onHide={handleCloseAddItemModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Add Item To {selectedGroupData?.group_name}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Tabs
+            defaultActiveKey="files"
+            id="items_to_add_tabs">
+            <Tab eventKey="files" title="Files" style={{maxHeight:'300px', overflow:'scroll'}}>
+              <FileList fileSelectionChanged={handleFileSelectionChanged}/>
+            </Tab>
+            <Tab eventKey="folders" title="Folders" style={{maxHeight:'300px', overflow:'scroll'}}>
+              <FolderList folderSelectionChanged={handleFolderSelectionChanged}/>
+            </Tab>
+          </Tabs>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseAddItemModal}>Cancel</Button>
+          <Button onClick={addItemsToGroup}>Add</Button>
+        </Modal.Footer>
       </Modal>
       <div className='container-fluid'>
         <div className="position-absolute bg-body-tertiary"
@@ -182,6 +276,9 @@ export default function GroupView({groups}:{groups: Promise<FilearchGroup[]|null
                 paddingLeft: '1vw'}}
               />
           </Suspense>
+          <Button disabled={selectedGroup == NO_GROUP_SELECTED} onClick={handleShowAddItemModal} style={{ position: "absolute", top: "calc(100vh - 13rem)", left: "calc(75vw - 6rem)", borderRadius: "30px", padding: "11px 16px", border: "solid 1px var(--bs-secondary)" }}>
+            <i className="bi bi-plus-lg"></i>
+          </Button>
         </div>
       </div>
       </>

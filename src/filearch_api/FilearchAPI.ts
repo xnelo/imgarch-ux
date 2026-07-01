@@ -165,3 +165,13 @@ export function AggregateErrorResponse<T>(apiResponse: FilearchAPIResponse<T>) :
     return res;
   }
 }
+
+export function ConcatenateErrorResponse(errors:ErrorResponse[]|null): string {
+  if (errors === null || errors.length <= 0) {
+    return "No Errors.";
+  }
+
+  return errors
+    .map(err=>err.error_message + " (" + err.error_code + ")")
+    .join("\n");
+}
