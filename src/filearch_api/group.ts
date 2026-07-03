@@ -363,3 +363,40 @@ export async function AddGroupItems(
       return null;
     }
   }
+
+export async function AcceptInvite(accessToken:string, groupId:number):Promise<boolean> {
+  try {
+    const resp = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/group/" + groupId + "/accept_invite",
+        {
+          method: "POST",
+          headers: {
+            'accept': 'application/json',
+            'Authorization': 'Bearer ' + accessToken,
+            'Content-Type': 'application/json'
+          },
+          body: ''
+        }
+      );
+    
+    if (resp.status != 200) {
+      return false;
+    }
+
+    const data:FilearchAPIResponse<boolean> = await resp.json();
+    const ar:ActionResponse<boolean> = data.action_responses[0];
+    if (ar.errors !== null && ar.errors.length > 0){
+      HandleActionResponse(ar);
+      return false;
+    }
+
+    if (ar.data === null){
+      return false;
+    } else {
+      return ar.data;
+    }
+
+  } catch (error) {
+    logger.error("Error accepting invite to group." + error);
+    return false;
+  }
+}

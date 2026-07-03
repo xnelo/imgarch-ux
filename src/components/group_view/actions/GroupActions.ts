@@ -1,7 +1,7 @@
 'use server'
 
 import { ActionResponse, FIlearchAllGroupPermission, FilearchGroupFile, FilearchGroupItem, FilearchGroupMember, FilearchGroupPermission, FilearchGroupPermissionType, PaginationContract } from "@/filearch_api/FilearchAPI";
-import { AddGroupItems, AddPeopleToGroup, CreateNewGroup, DeleteGroup, GetAllUserPermissionsForGroup, GetGroupPermissions, GetMembersInGroup, GetPaginatedGroupFiles, ModifyPermission, RemovePeopleFromGroup } from "@/filearch_api/group";
+import { AcceptInvite, AddGroupItems, AddPeopleToGroup, CreateNewGroup, DeleteGroup, GetAllUserPermissionsForGroup, GetGroupPermissions, GetMembersInGroup, GetPaginatedGroupFiles, ModifyPermission, RemovePeopleFromGroup } from "@/filearch_api/group";
 import { getSession } from "@/lib/lib";
 import logger from "@/lib/logger";
 
@@ -145,4 +145,16 @@ export async function AddGroupItemsAction(
   }
 
   return await AddGroupItems(session.access_token, groupId, itemsToAdd);
+}
+
+export async function ActivateGroupInvite(groupId:number): Promise<boolean>{
+  logger.debug("Acepting goup invite. group_id=" + groupId);
+
+  const session = await getSession();
+  if (session.access_token === undefined) {
+    logger.error("Error getting access token for session.");
+    return false;
+  }
+
+  return await AcceptInvite(session.access_token, groupId);
 }
