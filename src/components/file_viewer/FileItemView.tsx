@@ -122,7 +122,7 @@ export default function FileItemView(
     <div className="text-white bg-primary m-2" style={{ width: '18rem', paddingLeft: "0px", paddingRight: "0px" }}>
       {fileData.folder_in !== null && 
       <div style={{width:'18rem', overflow:'hidden', textWrap:'nowrap', position:'relative', float:'right'}}>
-        <div style={{background:'linear-gradient(90deg,rgba(var(--bs-info-rgb), 1) 80%, rgba(var(--bs-primary-rgb), 1) 100%)', color:'black', width:'16rem'}}>
+        <div style={{background:'linear-gradient(90deg,rgba(var(--bs-info-rgb), 1) 80%, rgba(var(--bs-primary-rgb), 1) 100%)', color:'black', width:'16rem', paddingTop:'8px', paddingBottom:'8px'}}>
           <Button className={styles.folderItem_removeGroupFolder} onClick={removeFolderClicked}>
             <i className={`bi bi-dash ${styles.folderItem_removeGroupFolder_dash}`}></i>
           </Button>
