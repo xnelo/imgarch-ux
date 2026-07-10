@@ -125,8 +125,8 @@ function MembersModalMemberPermissionCheckbox({memberInfo, permissionFor, disabl
 }
 
 function MembersModalGroupMemberItemView({memberInfo, currentUserId, canEditUserPermissions, canRemoveUser, removeMemberFunc}:{memberInfo:MembersModal_GroupMemberInfo, currentUserId:number, canEditUserPermissions:boolean, canRemoveUser:boolean, removeMemberFunc:(username:string)=>void}) {
-  const memberIsCurrentUser: boolean = memberInfo.userId === currentUserId;
-
+  const memberIsCurrentUserOrOwner: boolean = memberInfo.userId === currentUserId || memberInfo.groupMemberType === FilearchGroupMembershipType.OWNER;
+  
   const deleteUser = async (username:string) => {
     const result:ActionResponse<string>[]|null = await RemoveUsersFromGroupAction(memberInfo.groupId, [username]);
     if (result === null) {
@@ -156,8 +156,8 @@ function MembersModalGroupMemberItemView({memberInfo, currentUserId, canEditUser
  return (
     <tr>
       <td>{memberInfo.username}</td>
-      {canEditUserPermissions && editablePermissions.map(p=><td key={`permission_${memberInfo.userId}_${p}`}><MembersModalMemberPermissionCheckbox memberInfo={memberInfo} permissionFor={p} disabled={memberIsCurrentUser}/></td>)}
-      {canRemoveUser &&<td>{!memberIsCurrentUser && <a className={styles.DefaultAnchor} onClick={() => handleRemoveClicked(memberInfo.username)} >Remove</a>}</td>}
+      {canEditUserPermissions && editablePermissions.map(p=><td key={`permission_${memberInfo.userId}_${p}`}><MembersModalMemberPermissionCheckbox memberInfo={memberInfo} permissionFor={p} disabled={memberIsCurrentUserOrOwner}/></td>)}
+      {canRemoveUser &&<td>{!memberIsCurrentUserOrOwner && <a className={styles.DefaultAnchor} onClick={() => handleRemoveClicked(memberInfo.username)} >Remove</a>}</td>}
     </tr>
   );
 }

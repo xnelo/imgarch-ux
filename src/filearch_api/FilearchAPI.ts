@@ -114,7 +114,7 @@ export interface FilearchGroupMember {
   username: string;
   group_id: number;
   accepted: boolean;
-  group_member_type:FilearchGroupMembershipType;
+  group_membership_type:FilearchGroupMembershipType;
 }
 
 export interface FilearchGroupPermission {

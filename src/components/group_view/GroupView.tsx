@@ -39,7 +39,7 @@ function combineGroupInfoAndPermissionInfo(groupMembers:FilearchGroupMember[], g
       mem.username, 
       mem.group_id, 
       mem.accepted, 
-      mem.group_member_type,
+      mem.group_membership_type,
       memberPermissions===undefined?[]:memberPermissions.permissions);
   });
 }
