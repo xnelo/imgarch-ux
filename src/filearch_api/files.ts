@@ -1,6 +1,7 @@
 import logger from "@/lib/logger";
 import { ActionResponse, FilearchAPIResponse, FilearchFile, PaginationContract, ResourceType, SortDirection, StorageType } from "./FilearchAPI";
 import { logActionResponseErrors, MakeAPICall, SinglePaginatedCall } from "./FilearchAPI_ServerFunctions";
+import { group } from "console";
 
 export async function GetPaginatedSearchFiles(
   accessToken:string, 
@@ -66,8 +67,13 @@ export async function GetPaginatedFiles(
   return data.data;
 }
 
-export async function GetFileDownload(fileId: number, accessToken: string): Promise<Uint8Array<ArrayBuffer> | null> {
-  const response = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/download",
+export async function GetFileDownload(fileId: number, accessToken: string, groupId?: number): Promise<Uint8Array<ArrayBuffer> | null> {
+  let downloadUrl : string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/download";
+  if (groupId !== undefined) {
+    downloadUrl += "?group_id=" + groupId;
+  }
+
+  const response = await fetch(downloadUrl,
     {
       method: 'GET',
       headers: {
@@ -84,8 +90,13 @@ export async function GetFileDownload(fileId: number, accessToken: string): Prom
   }
 }
 
-export async function GetThumbnailDownload(fileId: number, accessToken: string): Promise<Uint8Array<ArrayBuffer>|null> {
-  const response = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/download_thumbnail",
+export async function GetThumbnailDownload(fileId: number, accessToken: string, groupId?:number): Promise<Uint8Array<ArrayBuffer>|null> {
+  let thumbnailUrl = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/download_thumbnail";
+  if (groupId !== undefined) {
+    thumbnailUrl += "?group_id=" + groupId;
+  }
+
+  const response = await fetch(thumbnailUrl,
     {
       method: 'GET',
       headers: {

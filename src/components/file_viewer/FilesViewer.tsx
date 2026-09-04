@@ -107,7 +107,8 @@ export default function FilesViewer(
       <FileViewer
         show={show}
         fileItemToShow={shownFileItem}
-        onHideCallback={handleCloseSelectedImage} />
+        onHideCallback={handleCloseSelectedImage}
+        groupViewId={groupViewId} />
       <div className="overflow-y-scroll"
         style={style}>
         {data.length <= 0 ?

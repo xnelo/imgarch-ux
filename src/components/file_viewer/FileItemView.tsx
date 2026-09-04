@@ -31,7 +31,7 @@ export default function FileItemView(
   const [imgUrl, setImgUrl] = useState<string | null>(null);
 
   const getImageToDisplay = async () => {
-    const rawImageData = await DownloadThumbnail(fileData.id);
+    const rawImageData = await DownloadThumbnail(fileData.id, groupViewId);
     if (rawImageData === null) {
       setIsLoading(false);
     } else {
