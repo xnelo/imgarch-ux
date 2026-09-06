@@ -10,7 +10,6 @@ import RenameFolder from "./tree/action_buttons/RenameFolder";
 import DeleteFolder from "./tree/action_buttons/DeleteFolder";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { FilearchGroup } from "@/filearch_api/group";
 
 export const NO_FOLDER_SELECTED: number = -1;
 
@@ -90,20 +89,13 @@ function findItemInTree(root: FolderItem | undefined, idToFind: number): FolderI
   }
 }
 
-export default function FolderView({ folders, groups }: { folders: Promise<FilearchFolder[] | null>, groups: Promise<FilearchGroup[]|null> }) {
+export default function FolderView({ folders }: { folders: Promise<FilearchFolder[] | null> }) {
 
 
   const allFolders = use(folders);
   if (allFolders === null) {
     return (
       <div>ERROR LOADING FOLDERS!</div>
-    );
-  }
-
-  const tmpAllGroups = use(groups);
-  if (tmpAllGroups === null) {
-    return (
-      <div>ERROR LOADING GROUPS!</div>
     );
   }
 
@@ -117,7 +109,6 @@ export default function FolderView({ folders, groups }: { folders: Promise<Filea
   let [rootFolder, setRootFolder] = useState<FolderItem | undefined>(tmpRoot);
   let [selectedFolder, setSelectedFolder] = useState(NO_FOLDER_SELECTED);
   let [selectedFolderItem, setSelectedFolderItem] = useState<FolderItem | undefined>(undefined);
-  let [allGroups, setAllGroups] = useState<FilearchGroup[] | null>(tmpAllGroups);
 
   function selectFolderEvent(selectedFolderId: number) {
     if (selectedFolderId === selectedFolder) {
@@ -188,16 +179,6 @@ export default function FolderView({ folders, groups }: { folders: Promise<Filea
                 {(rootFolder === undefined)
                   ? <div>NO DATA</div>
                   : <FolderTreeItemView data={rootFolder} selectFolderFunc={selectFolderEvent} selectedFolderState={selectedFolder} moveFolderEventComplete={moveFolderEventComplete} />}
-              </Suspense>
-            </div>
-            <hr style={{border:'var(--bs-primary) 1px solid !important'}}/>
-            <span>Groups</span>
-            <div>
-              <Suspense fallback={<div>Loading...</div>}>
-                {(allGroups === null) 
-                  ? <div>NO DATA</div>
-                  : <ul>{allGroups.map(i => <li key={i.id}>{i.group_name}</li>)}</ul>
-                }
               </Suspense>
             </div>
           </div>

@@ -4,18 +4,34 @@ import { FileItem } from "./FileItem";
 import { useEffect, useState } from "react";
 import { DownloadThumbnail } from "./actions/DownloadImage";
 import styles from "./FileViewer.module.css";
-import { Button } from "react-bootstrap";
-import { DeleteFileAction } from "./actions/DeleteFile";
-import { FilearchFile } from "@/filearch_api/files";
-import { ActionResponse, ErrorResponse } from "@/filearch_api/FilearchAPI";
+import { Button, OverlayTrigger, Popover } from "react-bootstrap";
+import { ActionResponse, ErrorResponse, FilearchFile, GroupItemType } from "@/filearch_api/FilearchAPI";
 import toast from "react-hot-toast";
+import { DeleteFileAction } from "./actions/DeleteFile";
+import { useDialog } from "../dialogs/DialogProvider";
+import { RemoveItemFromGroupAction } from "./actions/GroupActions";
 
-export default function FileItemView({ fileData, deleteEventCompleteCallback, showSelectedImageCallback }: { fileData: FileItem, deleteEventCompleteCallback: (deletedId: number) => void, showSelectedImageCallback: (selectedImage: FileItem) => void}) {
+export default function FileItemView(
+  { 
+    fileData, 
+    deleteEventCompleteCallback, 
+    showSelectedImageCallback,
+    refreshListCallback,
+    groupViewId
+  }: 
+    { 
+      fileData: FileItem, 
+      deleteEventCompleteCallback: (deletedId: number) => void, 
+      showSelectedImageCallback: (selectedImage: FileItem) => void,
+      refreshListCallback: () => void
+      groupViewId?: number
+    }
+  ) {
   const [isLoading, setIsLoading] = useState(true);
   const [imgUrl, setImgUrl] = useState<string | null>(null);
 
   const getImageToDisplay = async () => {
-    const rawImageData = await DownloadThumbnail(fileData.id);
+    const rawImageData = await DownloadThumbnail(fileData.id, groupViewId);
     if (rawImageData === null) {
       setIsLoading(false);
     } else {
@@ -47,16 +63,90 @@ export default function FileItemView({ fileData, deleteEventCompleteCallback, sh
     }
   };
 
+  const { openYesNoDialog } = useDialog();
+
+  const deleteItemClicked = async () => {
+    openYesNoDialog("Are you sure?", <p>Do you really want to delete file <b>{fileData.originalFilename}</b><i>({fileData.id})</i>?</p>, deleteItem);
+  };
+
   function imageSelected() {
     showSelectedImageCallback(fileData);
   }
 
+  const removeItem = async () => {
+    if (groupViewId === undefined) {
+      toast.error("Group Id is not defined. Contact support.");
+      return;
+    }
+    
+    const successfullyRemoved:boolean = await RemoveItemFromGroupAction(groupViewId, fileData.id, GroupItemType.FILE);
+    if (!successfullyRemoved) {
+      toast.error("Error removing file '" + fileData.originalFilename + "'(" + fileData.id + ") from group.");
+    } else { 
+      toast.success("File '" + fileData.originalFilename + "' removed from group.");
+      deleteEventCompleteCallback(fileData.id);
+    }
+  };
+
+  const removeItemClicked = async () => {
+    openYesNoDialog("Are you sure?", <p>Do you really want to remove <b>{fileData.originalFilename}</b><i>({fileData.id})</i>?</p>, removeItem);
+  };
+
+  const removeFolder = async () => {
+    if (groupViewId === undefined) {
+      toast.error("Group Id is not defined. Contact support.");
+      return;
+    }
+
+    if (fileData.folder_in_id === null) {
+      toast.error("We do not have folder ID. unable to remove folder.");
+      return;
+    }
+
+    const successfullyRemoved: boolean = await RemoveItemFromGroupAction(groupViewId, fileData.folder_in_id, GroupItemType.FOLDER);
+    if (!successfullyRemoved) {
+      toast.error("Error removing folder '" + fileData.folder_in + "' from group.");
+    } else {
+      toast.success("Folder '" + fileData.folder_in +"' removed.");
+      refreshListCallback();
+    }
+  };
+
+  const removeFolderClicked = async () => {
+    openYesNoDialog("Are you sure?",
+      <p>Do you really want to remove folder {fileData.folder_in}({fileData.folder_in_id}) from group.</p>,
+      removeFolder);
+  };
+
   return (
     <div className="text-white bg-primary m-2" style={{ width: '18rem', paddingLeft: "0px", paddingRight: "0px" }}>
+      {fileData.folder_in !== null && 
+      <div style={{width:'18rem', overflow:'hidden', textWrap:'nowrap', position:'relative', float:'right'}}>
+        <div style={{background:'linear-gradient(90deg,rgba(var(--bs-info-rgb), 1) 80%, rgba(var(--bs-primary-rgb), 1) 100%)', color:'black', width:'16rem', paddingTop:'8px', paddingBottom:'8px'}}>
+          <Button className={styles.folderItem_removeGroupFolder} onClick={removeFolderClicked}>
+            <i className={`bi bi-dash ${styles.folderItem_removeGroupFolder_dash}`}></i>
+          </Button>
+          <span style={{overflow:'hidden', maxWidth:'12.5rem', paddingLeft:'0.5rem', display:'block'}}>{fileData.folder_in}</span>
+        </div>
+      </div>}
       <div style={{width:"0px", height:"0px"}} >
-        <Button className={styles.fileitem_deletebutton} onClick={deleteItem}>
-          <i className="bi bi-trash3" style={{ fontSize: '0.75rem' }}></i>
-        </Button>
+        {groupViewId !== undefined && fileData.folder_in === null
+        ? <OverlayTrigger trigger="focus" placement="bottom"
+            overlay={
+              <Popover>
+                <Popover.Body>
+                  <div key={`fileDDItem_${fileData.id}_delete`}><a className={styles.folderView_defaultAnchor} onClick={deleteItemClicked}>Delete</a></div>
+                  <div key={`fileDDItem_${fileData.id}_remove`}><a className={styles.folderView_defaultAnchor} onClick={removeItemClicked}>Remove</a></div>
+                </Popover.Body>
+              </Popover>
+            }>
+              <Button className={styles.fileitem_deletebutton}>
+                <i className="bi bi-trash3" style={{ fontSize: '0.75rem' }}></i>
+              </Button>
+        </OverlayTrigger>
+        : <Button className={styles.fileitem_deletebutton} onClick={deleteItemClicked}>
+            <i className="bi bi-trash3" style={{ fontSize: '0.75rem' }}></i>
+          </Button>}
       </div>
       <div onClick={imageSelected}>
         <div className="text-center">

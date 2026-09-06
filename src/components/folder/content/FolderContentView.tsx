@@ -3,8 +3,7 @@
 import { FolderItem } from "../FolderItem";
 import { Button } from "react-bootstrap";
 import { UploadImage } from "./actions/UploadFiles";
-import { ActionResponse, ErrorResponse, FilearchAPIResponse, PaginationContract } from "@/filearch_api/FilearchAPI";
-import { FilearchFile } from "@/filearch_api/files";
+import { ActionResponse, ErrorResponse, FilearchAPIResponse, FilearchFile, PaginationContract } from "@/filearch_api/FilearchAPI";
 import toast from "react-hot-toast";
 import FilesViewer from "@/components/file_viewer/FilesViewer";
 import { useEffect, useState } from "react";

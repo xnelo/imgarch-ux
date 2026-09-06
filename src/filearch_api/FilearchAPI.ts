@@ -38,6 +38,29 @@ export enum SortDirection {
   DESCENDING = "DESCENDING"
 }
 
+export enum GroupItemType {
+  FOLDER = 'FOLDER',
+  FILE = 'FILE'
+}
+
+export enum FilearchGroupMembershipType {
+  OWNER = 'OWNER',
+  ADMIN = 'ADMIN',
+  MEMBER = 'MEMBER'
+}
+
+export enum FilearchGroupPermissionType {
+  UNKNOWN = 'UNKNOWN',
+  ADMIN = 'ADMIN',
+  ADD_MEMBERS = 'ADD_MEMBERS',
+  REMOVE_MEMBERS = 'REMOVE_MEMBERS',
+  EDIT_MEMBER_PERMISSIONS = 'EDIT_MEMBER_PERMISSIONS',
+  ADD_ITEMS = 'ADD_ITEMS',
+  REMOVE_ITEMS = 'REMOVE_ITEMS',
+  TAG_ITEMS = 'TAG_ITEMS',
+  REMOVE_TAGS = 'REMOVE_TAGS'
+}
+
 export interface FilearchAPI_IdObject{
   id: number;
 }
@@ -62,6 +85,54 @@ export interface ActionResponse<T> {
 
 export interface FilearchAPIResponse<T> {
   action_responses: ActionResponse<T>[];
+}
+
+export interface FilearchFile extends FilearchAPI_IdObject {
+  owner_id: number;
+  folder_id: number;
+  storage_type: StorageType;
+  storage_key: string;
+  original_filename: string;
+  mime_type: string;
+}
+
+export interface FilearchGroupFile extends FilearchFile {
+  item_type: GroupItemType;
+  folder_in: string;
+  folder_in_id: number|null;
+}
+
+export interface FilearchGroup extends FilearchAPI_IdObject {
+  owner_user_id: number;
+  group_name: string;
+  accepted: boolean;
+  group_membership_type: FilearchGroupMembershipType;
+}
+
+export interface FilearchGroupMember {
+  user_id: number;
+  username: string;
+  group_id: number;
+  accepted: boolean;
+  group_membership_type:FilearchGroupMembershipType;
+}
+
+export interface FilearchGroupPermission {
+  user_id: number;
+  group_id: number;
+  permission: FilearchGroupPermissionType;
+}
+
+export interface FIlearchAllGroupPermission {
+  user_id: number;
+  group_id: number;
+  permissions: FilearchGroupPermissionType[];
+}
+
+export interface FilearchGroupItem {
+  item_id: number;
+  item_type: GroupItemType;
+  group_id: number;
 }
 
 export function HandleActionResponse<T>(actionResponse: ActionResponse<T>) : void {
@@ -93,4 +164,14 @@ export function AggregateErrorResponse<T>(apiResponse: FilearchAPIResponse<T>) :
   } else {
     return res;
   }
+}
+
+export function ConcatenateErrorResponse(errors:ErrorResponse[]|null): string {
+  if (errors === null || errors.length <= 0) {
+    return "No Errors.";
+  }
+
+  return errors
+    .map(err=>err.error_message + " (" + err.error_code + ")")
+    .join("\n");
 }

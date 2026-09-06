@@ -3,8 +3,11 @@ import { FileItem } from "./FileItem";
 import FileItemView from "./FileItemView";
 import { useInView } from "react-intersection-observer";
 import FileViewer from "./FileViewer";
-import { PaginationContract } from "@/filearch_api/FilearchAPI";
-import { FilearchFile } from "@/filearch_api/files";
+import { FilearchFile, FilearchGroupFile, PaginationContract } from "@/filearch_api/FilearchAPI";
+
+function isGroupFile(toCheck:any): toCheck is FilearchGroupFile {
+  return toCheck && 'item_type' in toCheck && 'folder_in' in toCheck && 'folder_in_id' in toCheck;
+}
 
 function removeFile(currData: FileItem[], deletedId: number): FileItem[] {
   const newArray: FileItem[] = [];
@@ -25,7 +28,16 @@ function removeFile(currData: FileItem[], deletedId: number): FileItem[] {
  * @param getFileFunction Function that takes an afterId (for pagination) and returns a PaginationContract of FilearchFiles. This is used to fetch the files to display.
  * @param refreshTrigger A number that is used to trigger a refresh of the file list when it changes. This should be incremented whenever the underlying data changes (e.g. a file is added or deleted) to ensure the viewer fetches the latest data. 
  */
-export default function FilesViewer({ getFileFunction, refreshTrigger, style }: { getFileFunction: (afterId: number|null) => Promise<PaginationContract<FilearchFile> | null>, refreshTrigger: number, style?: CSSProperties | undefined }) {
+export default function FilesViewer(
+  { 
+    getFileFunction, 
+    refreshTrigger, 
+    groupViewId,
+    style }: 
+    { getFileFunction: (afterId: number|null) => Promise<PaginationContract<FilearchFile> | null>, 
+      refreshTrigger: number,
+      groupViewId?: number,
+      style?: CSSProperties | undefined }) {
   const [data, setData] = useState<FileItem[]>([]);
   const [moreToLoad, setMoreToLoad] = useState<boolean>(true);
   const [lastListItemId, setLastListItemId] = useState<number | null>(null);
@@ -45,7 +57,10 @@ export default function FilesViewer({ getFileFunction, refreshTrigger, style }: 
         storageType: z.storage_type,
         storageKey: z.storage_key,
         originalFilename: z.original_filename,
-        mimeType: z.mime_type
+        mimeType: z.mime_type,
+        item_type: isGroupFile(z) ? z.item_type : null,
+        folder_in: isGroupFile(z) ? z.folder_in : null,
+        folder_in_id: isGroupFile(z) ? z.folder_in_id : null
       }));
       setLastListItemId(mappedResults[mappedResults.length - 1].id);
       if (isInitialCall) {
@@ -83,12 +98,17 @@ export default function FilesViewer({ getFileFunction, refreshTrigger, style }: 
     setShow(false);
   };
 
+  function handleRefreshList() {
+    fetchData(true);
+  }
+
   return (
     <>
       <FileViewer
         show={show}
         fileItemToShow={shownFileItem}
-        onHideCallback={handleCloseSelectedImage} />
+        onHideCallback={handleCloseSelectedImage}
+        groupViewId={groupViewId} />
       <div className="overflow-y-scroll"
         style={style}>
         {data.length <= 0 ?
@@ -101,7 +121,13 @@ export default function FilesViewer({ getFileFunction, refreshTrigger, style }: 
             <h3>NO DATA</h3>
           </div> :
           <div className="row" style={{ width: '100%' }}>
-            {data.map(file => <FileItemView key={file.id} fileData={file} deleteEventCompleteCallback={deleteFileEventComplete} showSelectedImageCallback={handleShowSelectedImage} />)}
+            {data.map(file => <FileItemView 
+                                key={file.id} 
+                                fileData={file} 
+                                deleteEventCompleteCallback={deleteFileEventComplete} 
+                                showSelectedImageCallback={handleShowSelectedImage}
+                                refreshListCallback={handleRefreshList}
+                                groupViewId={groupViewId} />)}
             {moreToLoad &&
               <div className="text-center" ref={ref}>
                 Loading...

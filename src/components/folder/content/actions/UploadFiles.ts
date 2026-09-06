@@ -1,7 +1,7 @@
 'use server';
 
-import { FilearchAPIResponse } from "@/filearch_api/FilearchAPI";
-import { FilearchFile, UploadFile } from "@/filearch_api/files";
+import { FilearchAPIResponse, FilearchFile } from "@/filearch_api/FilearchAPI";
+import { UploadFile } from "@/filearch_api/files";
 import { getSession } from "@/lib/lib";
 import logger from "@/lib/logger";
 

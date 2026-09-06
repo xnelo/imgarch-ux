@@ -1,15 +1,7 @@
 import logger from "@/lib/logger";
-import { ActionResponse, ActionType, FilearchAPI_IdObject, FilearchAPIResponse, PaginationContract, ResourceType, SortDirection, StorageType } from "./FilearchAPI";
+import { ActionResponse, FilearchAPIResponse, FilearchFile, PaginationContract, ResourceType, SortDirection, StorageType } from "./FilearchAPI";
 import { logActionResponseErrors, MakeAPICall, SinglePaginatedCall } from "./FilearchAPI_ServerFunctions";
-
-export interface FilearchFile extends FilearchAPI_IdObject {
-  owner_id: number;
-  folder_id: number;
-  storage_type: StorageType;
-  storage_key: string;
-  original_filename: string;
-  mime_type: string;
-}
+import { group } from "console";
 
 export async function GetPaginatedSearchFiles(
   accessToken:string, 
@@ -35,6 +27,26 @@ export async function GetPaginatedSearchFiles(
   return data.data;
 }
 
+export async function GetPaginatedAllFiles(
+  accessToken:string,
+  afterId:number|null,
+  limit:number): Promise<PaginationContract<FilearchFile> | null> {
+    const data: ActionResponse<PaginationContract<FilearchFile>> = 
+      await SinglePaginatedCall<FilearchFile>(
+        accessToken,
+        process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file",
+        afterId,
+        SortDirection.ASCENDING,
+        limit,
+        ResourceType.FILE);
+    
+    if (data.errors !== null && data.errors.length > 0) {
+      logActionResponseErrors(data);
+      return null;
+    }
+    return data.data;
+  }
+
 export async function GetPaginatedFiles(
     accessToken:string, 
     folderId:number, 
@@ -55,8 +67,13 @@ export async function GetPaginatedFiles(
   return data.data;
 }
 
-export async function GetFileDownload(fileId: number, accessToken: string): Promise<Uint8Array<ArrayBuffer> | null> {
-  const response = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/download",
+export async function GetFileDownload(fileId: number, accessToken: string, groupId?: number): Promise<Uint8Array<ArrayBuffer> | null> {
+  let downloadUrl : string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/download";
+  if (groupId !== undefined) {
+    downloadUrl += "?group_id=" + groupId;
+  }
+
+  const response = await fetch(downloadUrl,
     {
       method: 'GET',
       headers: {
@@ -73,8 +90,13 @@ export async function GetFileDownload(fileId: number, accessToken: string): Prom
   }
 }
 
-export async function GetThumbnailDownload(fileId: number, accessToken: string): Promise<Uint8Array<ArrayBuffer>|null> {
-  const response = await fetch(process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/download_thumbnail",
+export async function GetThumbnailDownload(fileId: number, accessToken: string, groupId?:number): Promise<Uint8Array<ArrayBuffer>|null> {
+  let thumbnailUrl = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/download_thumbnail";
+  if (groupId !== undefined) {
+    thumbnailUrl += "?group_id=" + groupId;
+  }
+
+  const response = await fetch(thumbnailUrl,
     {
       method: 'GET',
       headers: {

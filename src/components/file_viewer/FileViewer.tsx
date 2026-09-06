@@ -18,7 +18,7 @@ const MAX_IMAGE_ZOOM: number = 400;
 const IMAGE_ZOOM_STEP: number = 5;
 const LOCAL_STORAGE_KEY_TOOL_ACTIVE_KEY = "fileViewerAccordionActiveKey";
 
-export default function FileViewer({ show, fileItemToShow, onHideCallback }: { show: boolean, fileItemToShow: FileItem | undefined, onHideCallback: () => void }) {
+export default function FileViewer({ show, fileItemToShow, onHideCallback, groupViewId }: { show: boolean, fileItemToShow: FileItem | undefined, onHideCallback: () => void, groupViewId: number|undefined }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const [imgZoom, setImgZoom] = useState<number>(DEFAULT_IMAGE_ZOOM);
@@ -34,7 +34,7 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback }: { s
   const getImageTags = async () => {
     setImgTags(null);
     if (fileItemToShow !== undefined) {
-      const tagsArray = await GetTagsForFile(fileItemToShow.id);
+      const tagsArray = await GetTagsForFile(fileItemToShow.id, groupViewId);
       if (tagsArray !== null) {
         let finalTags: TagItem[] = [];
         tagsArray.forEach((filearchTag: FilearchTag) => {
@@ -48,7 +48,7 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback }: { s
   const getImageToDisplay = async () => {
     setIsLoading(true);
     if (fileItemToShow !== undefined) {
-      const rawImageData = await DownloadImage(fileItemToShow.id);
+      const rawImageData = await DownloadImage(fileItemToShow.id, groupViewId);
       if (rawImageData === null) {
         setImgUrl(null);
       } else {

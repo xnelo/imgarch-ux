@@ -77,6 +77,8 @@ export async function SinglePaginatedCall<T>(
 
   const finalURL:string = url + `?${searchParams.toString()}`;
 
+  logger.debug("(SinglePaginatedCall) final URL: " + finalURL);
+
   try {
     const response = await MakeAPICall<PaginationContract<T>>(finalURL, 
       {

@@ -151,11 +151,17 @@ export async function GetAllTags(accessToken:string): Promise<FilearchTag[] | nu
     ResourceType.TAG);
 }
 
-export async function GetAllTagsOnFile(accessToken:string, fileId: number): Promise<FilearchTag[] | null> {
+export async function GetAllTagsOnFile(accessToken:string, fileId: number, groupId?:number): Promise<FilearchTag[] | null> {
+  let additionalParams :[string, string][]|undefined = undefined;
+  if (groupId !== undefined) {
+    additionalParams = [["group_id", String(groupId)]];
+  }
+
   return await GetAllPaginatedData(
     accessToken,
     process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/tags",
     SortDirection.ASCENDING, 
     TAG_LIMIT_PER_REQUEST,
-    ResourceType.TAG);
+    ResourceType.TAG,
+    additionalParams);
 }
