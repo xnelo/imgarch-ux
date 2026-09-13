@@ -3,7 +3,7 @@ import { AddNewTag, AddTagToFile, SearchTags } from "./actions/TagActions";
 import { FilearchTag } from "@/filearch_api/tag";
 import toast from "react-hot-toast";
 
-export default function TagSearch({fileId, tagAddedCallback}: {fileId: number | undefined, tagAddedCallback: (tag: FilearchTag) => void}) {
+export default function TagSearch({fileId, tagAddedCallback, groupViewId}: {fileId: number | undefined, tagAddedCallback: (tag: FilearchTag) => void, groupViewId: number | undefined}) {
   const [isAddTagEnabled, setIsAddTagEnabled] = useState(false);
   const [tagsInList, setTagsInList] = useState<FilearchTag[]>([]);
   const [currentInputTag, setCurrentInputTag] = useState<string>('');
@@ -68,7 +68,7 @@ export default function TagSearch({fileId, tagAddedCallback}: {fileId: number | 
     }
     
     // now add the tag to the file
-    const addTagResult = await AddTagToFile(tagToUse.id, fileId);
+    const addTagResult = await AddTagToFile(tagToUse.id, fileId, groupViewId);
     if (!addTagResult) {
       toast.error("Error adding tag to file. Please contact support.");
       return;

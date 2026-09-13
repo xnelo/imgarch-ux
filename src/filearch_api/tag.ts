@@ -83,8 +83,13 @@ export async function AddNewTag(accessToken:string, tagName: string): Promise<Fi
   }
 }
 
-export async function AddTagToFile(accessToken:string, tagId: number, fileId: number): Promise<boolean> {
-  const finalUrl: string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/assign_tag";
+export async function AddTagToFile(accessToken:string, tagId: number, fileId: number, groupId?:number): Promise<boolean> {
+  let finalUrl: string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/assign_tag";
+
+  if (groupId !== undefined) {
+    finalUrl += "?group_id=" + groupId;
+  }
+
   const assignTagData = {
     tag_id: tagId
   };
@@ -116,8 +121,13 @@ export async function AddTagToFile(accessToken:string, tagId: number, fileId: nu
   }
 }
 
-export async function RemoveTagFromFile(accessToken:string, tagId: number, fileId: number): Promise<boolean> {
-  const finalUrl: string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/unassign_tag";
+export async function RemoveTagFromFile(accessToken:string, tagId: number, fileId: number, groupId?:number): Promise<boolean> {
+  let finalUrl: string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/unassign_tag";
+
+  if (groupId !== undefined) {
+    finalUrl += "?group_id=" + groupId;
+  }
+
   const removeTagData = {
     tag_id: tagId
   };

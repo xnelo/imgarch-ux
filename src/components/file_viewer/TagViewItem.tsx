@@ -7,14 +7,14 @@ export interface TagItem {
   tagName: string;
 }
 
-export default function TagViewItem({ tagItem, fileOn, tagRemovedCallback, showTagModalCallback }: { tagItem: TagItem, fileOn: number | undefined, tagRemovedCallback: (tagId: number) => void, showTagModalCallback: (tagId:number)=>void }) {
+export default function TagViewItem({ tagItem, fileOn, tagRemovedCallback, showTagModalCallback, groupViewId}: { tagItem: TagItem, fileOn: number | undefined, tagRemovedCallback: (tagId: number) => void, showTagModalCallback: (tagId:number)=>void, groupViewId:number|undefined }) {
   function handleRemoveTag() {
     if (fileOn === undefined) {
       toast.error("No file selected to remove tag from. Please contact support.");
       return;
     }
 
-    RemoveTagFromFile(tagItem.id, fileOn).then((result: boolean) => {
+    RemoveTagFromFile(tagItem.id, fileOn, groupViewId).then((result: boolean) => {
       if (result) {
         toast.success("Tag '" + tagItem.tagName + "' removed from file.");
         tagRemovedCallback(tagItem.id);

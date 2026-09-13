@@ -32,24 +32,24 @@ export async function AddNewTag(tagName: string) {
   return await APIAddNewTag(session.access_token, tagName);
 }
 
-export async function AddTagToFile(tagId: number, fileId: number) {
-  logger.debug("Adding tag to file: tagId=" + tagId + ", fileId=" + fileId);
+export async function AddTagToFile(tagId: number, fileId: number, groupId:number|undefined) {
+  logger.debug("Adding tag to file: tagId=" + tagId + ", fileId=" + fileId + (groupId !== undefined ? ", group_id=" + groupId : ""));
   const session = await getSession();
   if (session.access_token === undefined) {
     logger.error("Access token is 'undefined'. Cannot call API.");
     return false;
   }
-  return await APIAddTagToFile(session.access_token, tagId, fileId);
+  return await APIAddTagToFile(session.access_token, tagId, fileId, groupId);
 }
 
-export async function RemoveTagFromFile(tagId: number, fileId: number) {
-  logger.debug("Removing tag from file: tagId=" + tagId + ", fileId=" + fileId);
+export async function RemoveTagFromFile(tagId: number, fileId: number, groupId:number|undefined) {
+  logger.debug("Removing tag from file: tagId=" + tagId + ", fileId=" + fileId + (groupId !== undefined ? ", group_id=" + groupId : ""));
   const session = await getSession();
   if (session.access_token === undefined) {
     logger.error("Access token is 'undefined'. Cannot call API.");
     return false;
   }
-  return await APIRemoveTagFromFile(session.access_token, tagId, fileId);
+  return await APIRemoveTagFromFile(session.access_token, tagId, fileId, groupId);
 }
 
 export async function GetGroupIdsTagIsSharedIn(tagId: number): Promise<number[]> {

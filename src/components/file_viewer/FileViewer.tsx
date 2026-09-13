@@ -190,11 +190,11 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback, group
               <Accordion.Item eventKey="1">
                 <Accordion.Header>Tags</Accordion.Header>
                 <Accordion.Body>
-                  <TagSearch fileId={fileItemToShow?.id} tagAddedCallback={tagAddedToFile} />
+                  <TagSearch fileId={fileItemToShow?.id} tagAddedCallback={tagAddedToFile} groupViewId={groupViewId} />
                   <div className='mt-2'>
                     {(imgTags === null || imgTags.length <= 0) ?
                       <span>NO TAGS</span> :
-                      imgTags.map(tag => <TagViewItem key={tag.id} tagItem={tag} fileOn={fileItemToShow?.id} tagRemovedCallback={tagRemovedFromFile} showTagModalCallback={showTagModalCallback}/>)
+                      imgTags.map(tag => <TagViewItem key={tag.id} tagItem={tag} fileOn={fileItemToShow?.id} tagRemovedCallback={tagRemovedFromFile} showTagModalCallback={showTagModalCallback} groupViewId={groupViewId}/>)
                     }
                   </div>
                 </Accordion.Body>
