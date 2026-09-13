@@ -4,7 +4,10 @@ import {
   SearchTags as APISearchTags,
   AddNewTag as APIAddNewTag,
   AddTagToFile as APIAddTagToFile,
-  RemoveTagFromFile as APIRemoveTagFromFile
+  RemoveTagFromFile as APIRemoveTagFromFile,
+  GetGroupIdsTagIsSharedIn as APIGetGroupIdsTagIsSharedIn,
+  ShareTagWithGroup as APIShareTagWithGroup,
+  UnshareTagWithGroup as APIUnshareTagWithGroup
 } from "@/filearch_api/tag";
 import { getSession } from "@/lib/lib";
 import logger from "@/lib/logger";
@@ -47,4 +50,34 @@ export async function RemoveTagFromFile(tagId: number, fileId: number) {
     return false;
   }
   return await APIRemoveTagFromFile(session.access_token, tagId, fileId);
+}
+
+export async function GetGroupIdsTagIsSharedIn(tagId: number): Promise<number[]> {
+  logger.debug("Getting groups tags are shared in.");
+  const session = await getSession();
+  if (session.access_token === undefined) {
+    logger.error("Access token is 'undefined'. Cannot call API.");
+    return [];
+  }
+  return await APIGetGroupIdsTagIsSharedIn(session.access_token, tagId);
+}
+
+export async function ShareTagWithGroup(tagId: number, groupId: number): Promise<boolean> {
+  logger.debug("Sharing tag(" + tagId + ") with group(" + groupId +").");
+  const session = await getSession();
+  if (session.access_token === undefined) {
+    logger.error("Access token is 'undefined'. Cannot call API.");
+    return false;
+  }
+  return await APIShareTagWithGroup(session.access_token, tagId, groupId);
+}
+
+export async function UnshareTagWithGroup(tagId: number, groupId: number): Promise<boolean> {
+  logger.debug("Unsharing tag(" + tagId + ") with group(" + groupId +").");
+  const session = await getSession();
+  if (session.access_token === undefined) {
+    logger.error("Access token is 'undefined'. Cannot call API.");
+    return false;
+  }
+  return await APIUnshareTagWithGroup(session.access_token, tagId, groupId);
 }

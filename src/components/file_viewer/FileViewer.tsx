@@ -11,6 +11,7 @@ import { FilearchTag } from '@/filearch_api/tag';
 import TagSearch from './TagSearch';
 import TagViewItem, { TagItem } from './TagViewItem';
 import { AccordionEventKey } from 'react-bootstrap/esm/AccordionContext';
+import ShareTagModal from './ShareTagModal';
 
 const DEFAULT_IMAGE_ZOOM: number = 100;
 const MIN_IMAGE_ZOOM: number = 25;
@@ -115,8 +116,32 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback, group
     localStorage.setItem(LOCAL_STORAGE_KEY_TOOL_ACTIVE_KEY, eventKey === null || eventKey === undefined ? "" : eventKey.toString());
   }
 
+  const [showTagModal, setShowTagModal] = useState<boolean>(false);
+  const [tagModalTagData, setTagModalTagData] = useState<TagItem|undefined>(undefined);
+
+  function showTagModalCallback(tagId:number){
+    const tagData = imgTags?.find(tag=>tag.id == tagId);
+
+    if (tagData === undefined) {
+      return; // DO NOTHING
+    }
+
+    setShowTagModal(true);
+    setTagModalTagData(tagData);
+  }
+
+  function onTagModalHideCallback() {
+    setShowTagModal(false);
+  }
+
   return (
-    <Modal show={show} fullscreen={true} onShow={handleOnShow} onHide={onHideCallback} style={{ zIndex: 9999 }}>
+    <>
+    <ShareTagModal
+      show={showTagModal}
+      tagItemToShow={tagModalTagData}
+      onHideCallback={onTagModalHideCallback}
+    />
+    <Modal show={show} fullscreen={true} onShow={handleOnShow} onHide={onHideCallback} style={{ zIndex: 9998 }}>
       <Modal.Header closeButton>
         <Modal.Title>{fileItemToShow?.originalFilename}</Modal.Title>
       </Modal.Header>
@@ -169,7 +194,7 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback, group
                   <div className='mt-2'>
                     {(imgTags === null || imgTags.length <= 0) ?
                       <span>NO TAGS</span> :
-                      imgTags.map(tag => <TagViewItem key={tag.id} tagItem={tag} fileOn={fileItemToShow?.id} tagRemovedCallback={tagRemovedFromFile} />)
+                      imgTags.map(tag => <TagViewItem key={tag.id} tagItem={tag} fileOn={fileItemToShow?.id} tagRemovedCallback={tagRemovedFromFile} showTagModalCallback={showTagModalCallback}/>)
                     }
                   </div>
                 </Accordion.Body>
@@ -186,5 +211,6 @@ export default function FileViewer({ show, fileItemToShow, onHideCallback, group
         </div>
       </Modal.Body>
     </Modal>
+    </>
   );
 }

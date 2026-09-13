@@ -7,7 +7,7 @@ export interface TagItem {
   tagName: string;
 }
 
-export default function TagViewItem({ tagItem, fileOn, tagRemovedCallback }: { tagItem: TagItem, fileOn: number | undefined, tagRemovedCallback: (tagId: number) => void }) {
+export default function TagViewItem({ tagItem, fileOn, tagRemovedCallback, showTagModalCallback }: { tagItem: TagItem, fileOn: number | undefined, tagRemovedCallback: (tagId: number) => void, showTagModalCallback: (tagId:number)=>void }) {
   function handleRemoveTag() {
     if (fileOn === undefined) {
       toast.error("No file selected to remove tag from. Please contact support.");
@@ -26,10 +26,16 @@ export default function TagViewItem({ tagItem, fileOn, tagRemovedCallback }: { t
     });
   }
 
+  function handleOpenTagModal() {
+    showTagModalCallback(tagItem.id);
+  }
+
   return (
     <span data-tag-id={tagItem.id}
       className={`badge rounded-pill text-bg-primary me-2 ${styles.folderView_tag}`}>
+      <a onClick={handleOpenTagModal}>
       {tagItem.tagName}
+      </a>
       <a data-tag-id={tagItem.id}
         onClick={handleRemoveTag}>
         <i className="bi bi-x-circle" style={{fontSize:'0.95em'}}></i>
