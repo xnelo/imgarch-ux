@@ -1,0 +1,31 @@
+.TagGroupColumnCommon {
+  height: calc(70vh - 6px);
+  overflow: scroll;
+  list-style: none;
+  padding: 0px;
+}
+
+.TagGroupAvailableColumn {
+  background-color: pink;
+  padding-top: 5px;
+  padding-left: 5px;
+  padding-right: 1px;
+  padding-bottom: 0px;
+}
+
+.TagGroupInColumn {
+  background-color: purple;
+  padding-top: 5px;
+  padding-left: 5px;
+  padding-right: 1px;
+  padding-bottom: 0px;
+}
+
+.TagGroupItem {
+  background-color: chartreuse;
+  margin: 10px;
+  width: fit-content;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 25px;
+}

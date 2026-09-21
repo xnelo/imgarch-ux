@@ -17,6 +17,34 @@ interface TagShareResult {
   action_successful: boolean;
 }
 
+export async function GetTagInfo(accessToken:string, tagId:number): Promise<FilearchTag | null> {
+  const finalURL:string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/tag/" + tagId;
+
+  const initParams:RequestInit = {
+    method: 'GET',
+    headers: {
+      'accept': 'application/json',
+      'Authorization': 'Bearer ' + accessToken
+    }
+  };
+
+  const response:ActionResponse<FilearchTag>[] = await MakeAPICall<FilearchTag>(finalURL, initParams, ResourceType.TAG, ActionType.GET);
+
+  if (response[0].errors !== null && response[0].errors.length > 0) {
+    // Log errors and return null
+    logger.error("Response contains errors.");
+    logActionResponseErrors(response[0]);
+    return null;
+  } else if (response[0].data === null) {
+    // this should not happen
+    // log error and return null
+    logger.error("Response data NULL url=" + finalURL);
+    return null;
+  } else {
+    return response[0].data;
+  }
+}
+
 export async function SearchTags(accessToken:string, searchVal:string): Promise<FilearchTag[] | null> {
   // create the final URL with queryparams
   let searchParams : URLSearchParams = new URLSearchParams();
