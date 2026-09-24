@@ -33,7 +33,7 @@ export default async function TagDetailPage({params,}: {params: Promise<{ slug: 
   return (
     <main>
       
-      <div className="container" style={{background:"red", paddingBottom:"12px", paddingTop:"12px"}}>
+      <div className="container" style={{background:"var(--bs-light)", paddingBottom:"12px", paddingTop:"12px"}}>
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb">
             <li className="breadcrumb-item"><a href="/images/">Home</a></li>
@@ -42,9 +42,11 @@ export default async function TagDetailPage({params,}: {params: Promise<{ slug: 
           </ol>
         </nav>
 
-        <div style={{background:"yellow"}}>
-          <h1 style={{background:"green"}}>Tag Detials: {tagInfo.tag_name}</h1>
-          <span>id: {tagInfo.id}</span>
+        <div>
+          <h1>Tag Detials: {tagInfo.tag_name}</h1>
+          <div style={{paddingLeft:'10px'}}>
+            <span>id: {tagInfo.id}</span>
+          </div>
         </div>
 
         <TagGroupView tagId={tagInfo.id} groupsUserIn={groupsUserIn} idOfGroupsTagIn={groupsTagIn}/>

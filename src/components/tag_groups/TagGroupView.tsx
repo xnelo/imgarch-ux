@@ -43,7 +43,10 @@ function GroupViewItem({groupInfo}:{groupInfo:GroupInfo}) {
   );
 
   return (
-    <li ref={el=>{drag(el)}} className={styles.TagGroupItem}>{groupInfo.group_name} ({groupInfo.id}) {groupInfo.is_moving && <span>[moving]</span>}</li>
+    <li ref={el=>{drag(el)}} className={`badge rounded-pill bg-primary ${styles.TagGroupItem}`}>
+      {groupInfo.group_name} ({groupInfo.id}) 
+      {groupInfo.is_moving && <img className={`${styles.rotate_image} ${styles.LoadingImage}`} src="/loading.png" width={15} height={15} />}
+    </li>
   );
 }
 
@@ -103,13 +106,9 @@ export default function TagGroupView({ tagId, groupsUserIn, idOfGroupsTagIn}: {t
   }
 
   async function unshareDropCallback (groupInfo:GroupInfo) {
-    alert("UN-Sharing tag (" + tagId + ") with " + groupInfo.id);
-
     moveGroupToGroupsToDisplay(groupInfo);
 
     const unShareRes : boolean = await UnShareTagWithGroup(tagId, groupInfo.id);
-
-    await new Promise((resolve) => setTimeout(resolve, 5000)); //TODO: Remove when moving UI done
 
     if (unShareRes) {
       updateItemMovingProperty(setGroupsToDisplay, groupInfo.id, false);
@@ -119,13 +118,9 @@ export default function TagGroupView({ tagId, groupsUserIn, idOfGroupsTagIn}: {t
   };
 
   async function shareDropCallback (groupInfo:GroupInfo) {
-    alert("Sharing tag (" + tagId + ") with " + groupInfo.id);
-
     moveGroupToGroupsTagInToDisplay(groupInfo);
 
     const shareRes : boolean = await ShareTagWithGroup(tagId, groupInfo.id);
-
-    await new Promise((resolve) => setTimeout(resolve, 5000)); //TODO: Remove when moving UI done
 
     if (shareRes) {
       updateItemMovingProperty(setGroupsTagInToDisplay, groupInfo.id, false);
@@ -136,7 +131,7 @@ export default function TagGroupView({ tagId, groupsUserIn, idOfGroupsTagIn}: {t
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="container">
+      <div className="container" style={{marginTop:'20px'}}>
         <div className="row">
           <div className={`col ${styles.TagGroupAvailableColumn}`}>
             <h3>Groups Available</h3>
