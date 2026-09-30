@@ -1,0 +1,11 @@
+.TagManagement_TagsTable {
+  height: calc(79vh - 4px);
+  padding-left: 10px;
+  overflow: scroll;
+}
+
+.TagManagement_TagsTable th {
+  position: sticky;
+  top: 0;
+  background-color: var(--bs-light);
+}

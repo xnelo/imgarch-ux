@@ -349,3 +349,42 @@ export async function UnshareTagWithGroup(accessToken:string, tagId:number, grou
     }
   }
 }
+
+export async function DeleteTag(accessToken:string, tagId:number) : Promise<boolean> {
+  const finalURL:string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/tag/" + tagId;
+
+  const initParams:RequestInit = {
+      method: 'DELETE',
+      headers: {
+        'accept': 'application/json',
+        'Authorization': 'Bearer ' + accessToken
+      }
+    };
+
+  const response : ActionResponse<FilearchTag>[] = await MakeAPICall<FilearchTag>(finalURL, initParams, ResourceType.TAG, ActionType.DELETE);
+
+  if (response.length > 1) {
+    logger.warn("There are more than 1 action response objects return. Loss of data can Occur. Please check with Back End.");
+  } else if (response.length <= 0) {
+    logger.error("No data returned. Please check with Back End.");
+    return false;
+  }
+
+  const responseAction = response[0];
+  if (responseAction.errors !== null && responseAction.errors.length > 0) {
+    logger.error("Response contains errors.");
+    logActionResponseErrors(response[0]);
+    return false;
+  } else if (responseAction.data === null) {
+    logger.error("Response data is null. URL=" + finalURL);
+    return false;
+  } else {
+    const tagData:FilearchTag = responseAction.data;
+    if (tagData.id !== tagId) {
+      logger.error("Response tag ID doesn't match.");
+      return false;
+    } else {
+      return true;
+    }
+  }
+}

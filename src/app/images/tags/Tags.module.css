@@ -1,0 +1,14 @@
+.TagManagementContainer {
+  background-color: var(--bs-light);
+  height: calc(90vh - 1px);
+  padding-top: 12px;
+}
+
+.TagManagement_Tags {
+  padding: 1px;
+  border: solid 1px;
+  border-radius: 5px;
+  height: 79vh;
+}
+
+
