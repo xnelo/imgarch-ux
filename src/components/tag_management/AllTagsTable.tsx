@@ -22,15 +22,23 @@ export default function AllTagsTable({allTags}:{allTags:Promise<FilearchTag[] | 
 
   return (
     <div className={styles.TagManagement_TagsTable}>
-      <table>
+      <table className="table table-hover">
         <thead>
-        <tr><th>ID</th><th>Name</th><th>Delete</th></tr>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Times Used</th>
+          <th>Groups In</th>
+          <th>Delete</th>
+          </tr>
         </thead>
         <tbody>
         {tags?.map(t=>
           <tr key={t.id}>
             <td>{t.id}</td>
             <td><a href={`/images/tags/${t.id}/`}>{t.tag_name}</a></td>
+            <td>{t.stats!=null?t.stats.usage_count:0}</td>
+            <td>{t.stats!=null?t.stats.groups_in_count:0}</td>
             <td><DeleteTagButton tagId={t.id} onDeleteCallback={onDeleteCallback}/></td>
           </tr>)}
         </tbody>

@@ -6,9 +6,15 @@ import { group } from "console";
 const TAG_LIMIT_PER_REQUEST:number = 1000;
 const TAG_SEARCH_LIMIT_DEFAULT:number = 15;
 
+export interface FilearchTagStats {
+  usage_count: number;
+  groups_in_count: number;
+}
+
 export interface FilearchTag extends FilearchAPI_IdObject {
   owner_id: number;
   tag_name: string;
+  stats: FilearchTagStats | null;
 }
 
 interface TagShareResult {
@@ -187,13 +193,20 @@ export async function RemoveTagFromFile(accessToken:string, tagId: number, fileI
   }
 }
 
-export async function GetAllTags(accessToken:string): Promise<FilearchTag[] | null> {
+export async function GetAllTags(accessToken:string, includeStats?:boolean): Promise<FilearchTag[] | null> {
+  let additionalParams:[string, string][] | undefined = undefined;
+  if (includeStats !== undefined) {
+    additionalParams = [["stats", String(includeStats)]]
+  }
+  
+  [["stats", "true"]] 
   return await GetAllPaginatedData(
     accessToken,
     process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/tag",
     SortDirection.ASCENDING, 
     TAG_LIMIT_PER_REQUEST,
-    ResourceType.TAG);
+    ResourceType.TAG,
+    additionalParams);
 }
 
 export async function GetAllTagsOnFile(accessToken:string, fileId: number, groupId?:number): Promise<FilearchTag[] | null> {

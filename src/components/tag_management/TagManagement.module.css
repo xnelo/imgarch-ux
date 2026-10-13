@@ -9,3 +9,12 @@
   top: 0;
   background-color: var(--bs-light);
 }
+
+.TagDeleteButton {
+  color: var(--bs-body-color);
+}
+
+.TagDeleteButton:hover {
+  color: var(--bs-primary-text-emphasis);
+  cursor: pointer;
+}

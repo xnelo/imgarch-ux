@@ -15,7 +15,7 @@ export default async function TagsPage() {
     );
   }
 
-  const tags: Promise<FilearchTag[] | null> = GetAllTags(session.access_token);
+  const tags: Promise<FilearchTag[] | null> = GetAllTags(session.access_token, true);
 
   return (
           <main>

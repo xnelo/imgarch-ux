@@ -2,6 +2,7 @@
 
 import toast from "react-hot-toast";
 import { DeleteTag } from "./actions/TagActions";
+import styles from "./TagManagement.module.css"
 
 export default function DeleteTagButton({tagId, onDeleteCallback}:{tagId:number, onDeleteCallback:(tagId:number)=>void}) {
   const deleteTag = async () => {
@@ -17,6 +18,6 @@ export default function DeleteTagButton({tagId, onDeleteCallback}:{tagId:number,
   };
 
   return (
-    <a onClick={deleteTag}><i className="bi bi-trash3-fill"></i></a>
+    <a onClick={deleteTag} className={styles.TagDeleteButton}><i className="bi bi-trash3-fill"></i></a>
   );
 } 
