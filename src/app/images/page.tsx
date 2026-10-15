@@ -4,6 +4,8 @@ export default async function ImagesPage() {
               <h2>Images Home</h2>
               <ul>
                 <li><a href="/images/folder">Folder View</a></li>
+                <li><a href="/images/groups">Groups Managment</a></li>
+                <li><a href="/images/tags">Tag Management</a></li>
                 <li><a href="/images/search">Search View</a></li>
               </ul>
           </main>

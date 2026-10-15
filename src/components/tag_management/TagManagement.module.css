@@ -1,0 +1,20 @@
+.TagManagement_TagsTable {
+  height: calc(79vh - 4px);
+  padding-left: 10px;
+  overflow: scroll;
+}
+
+.TagManagement_TagsTable th {
+  position: sticky;
+  top: 0;
+  background-color: var(--bs-light);
+}
+
+.TagDeleteButton {
+  color: var(--bs-body-color);
+}
+
+.TagDeleteButton:hover {
+  color: var(--bs-primary-text-emphasis);
+  cursor: pointer;
+}

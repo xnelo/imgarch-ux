@@ -1,13 +1,54 @@
 import logger from "@/lib/logger";
 import { ActionResponse, ActionType, FilearchAPI_IdObject, ResourceType, SortDirection } from "./FilearchAPI";
 import { GetAllPaginatedData, logActionResponseErrors, MakeAPICall } from "./FilearchAPI_ServerFunctions"
+import { group } from "console";
 
 const TAG_LIMIT_PER_REQUEST:number = 1000;
 const TAG_SEARCH_LIMIT_DEFAULT:number = 15;
 
+export interface FilearchTagStats {
+  usage_count: number;
+  groups_in_count: number;
+}
+
 export interface FilearchTag extends FilearchAPI_IdObject {
   owner_id: number;
   tag_name: string;
+  stats: FilearchTagStats | null;
+}
+
+interface TagShareResult {
+  tag_id: number;
+  group_id: number;
+  action_successful: boolean;
+}
+
+export async function GetTagInfo(accessToken:string, tagId:number): Promise<FilearchTag | null> {
+  const finalURL:string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/tag/" + tagId;
+
+  const initParams:RequestInit = {
+    method: 'GET',
+    headers: {
+      'accept': 'application/json',
+      'Authorization': 'Bearer ' + accessToken
+    }
+  };
+
+  const response:ActionResponse<FilearchTag>[] = await MakeAPICall<FilearchTag>(finalURL, initParams, ResourceType.TAG, ActionType.GET);
+
+  if (response[0].errors !== null && response[0].errors.length > 0) {
+    // Log errors and return null
+    logger.error("Response contains errors.");
+    logActionResponseErrors(response[0]);
+    return null;
+  } else if (response[0].data === null) {
+    // this should not happen
+    // log error and return null
+    logger.error("Response data NULL url=" + finalURL);
+    return null;
+  } else {
+    return response[0].data;
+  }
 }
 
 export async function SearchTags(accessToken:string, searchVal:string): Promise<FilearchTag[] | null> {
@@ -76,8 +117,13 @@ export async function AddNewTag(accessToken:string, tagName: string): Promise<Fi
   }
 }
 
-export async function AddTagToFile(accessToken:string, tagId: number, fileId: number): Promise<boolean> {
-  const finalUrl: string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/assign_tag";
+export async function AddTagToFile(accessToken:string, tagId: number, fileId: number, groupId?:number): Promise<boolean> {
+  let finalUrl: string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/assign_tag";
+
+  if (groupId !== undefined) {
+    finalUrl += "?group_id=" + groupId;
+  }
+
   const assignTagData = {
     tag_id: tagId
   };
@@ -109,8 +155,13 @@ export async function AddTagToFile(accessToken:string, tagId: number, fileId: nu
   }
 }
 
-export async function RemoveTagFromFile(accessToken:string, tagId: number, fileId: number): Promise<boolean> {
-  const finalUrl: string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/unassign_tag";
+export async function RemoveTagFromFile(accessToken:string, tagId: number, fileId: number, groupId?:number): Promise<boolean> {
+  let finalUrl: string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/unassign_tag";
+
+  if (groupId !== undefined) {
+    finalUrl += "?group_id=" + groupId;
+  }
+
   const removeTagData = {
     tag_id: tagId
   };
@@ -142,13 +193,20 @@ export async function RemoveTagFromFile(accessToken:string, tagId: number, fileI
   }
 }
 
-export async function GetAllTags(accessToken:string): Promise<FilearchTag[] | null> {
+export async function GetAllTags(accessToken:string, includeStats?:boolean): Promise<FilearchTag[] | null> {
+  let additionalParams:[string, string][] | undefined = undefined;
+  if (includeStats !== undefined) {
+    additionalParams = [["stats", String(includeStats)]]
+  }
+  
+  [["stats", "true"]] 
   return await GetAllPaginatedData(
     accessToken,
     process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/tag",
     SortDirection.ASCENDING, 
     TAG_LIMIT_PER_REQUEST,
-    ResourceType.TAG);
+    ResourceType.TAG,
+    additionalParams);
 }
 
 export async function GetAllTagsOnFile(accessToken:string, fileId: number, groupId?:number): Promise<FilearchTag[] | null> {
@@ -164,4 +222,182 @@ export async function GetAllTagsOnFile(accessToken:string, fileId: number, group
     TAG_LIMIT_PER_REQUEST,
     ResourceType.TAG,
     additionalParams);
+}
+
+export async function GetGroupIdsTagIsSharedIn(accessToken:string, tagId:number): Promise<number[]> {
+  const finalUrl: string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/tag/" + tagId + "/groups_in";
+
+  const initParams:RequestInit = {
+    method: 'GET',
+    headers: {
+      'accept': 'application/json',
+      'Authorization': 'Bearer ' + accessToken
+    }
+  };
+
+  const response = await MakeAPICall(finalUrl, initParams, ResourceType.TAG, ActionType.GET);
+
+  if (response.length > 1) {
+    logger.warn("There are more than 1 action response objects return. Loss of data can Occur. Please check with Back End.");
+  } else if (response.length <= 0) {
+    logger.error("No data returned. Please check with Back End.");
+    return [];
+  }
+
+  const responseAction = response[0];
+  if (responseAction.errors !== null && responseAction.errors.length > 0) {
+    logger.error("Response contains errors.");
+    logActionResponseErrors(response[0]);
+    return [];
+  } else if (responseAction.data === null) {
+    logger.error("Response data is null. URL=" + finalUrl);
+    return [];
+  } else {
+    return responseAction.data as number[];
+  }
+}
+
+export async function ShareTagWithGroup(accessToken:string, tagId:number, groupId:number): Promise<boolean> {
+  const finalURL:string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/tag/share"
+
+  const shareTagData = {
+    share: [
+      {
+        tag_id: tagId,
+        group_id: groupId
+      }
+    ]
+  };
+
+  const initParams:RequestInit = {
+    method: 'POST',
+    headers: {
+      'accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + accessToken
+    },
+    body: JSON.stringify(shareTagData)
+  };
+
+  const response : ActionResponse<TagShareResult>[] = await MakeAPICall<TagShareResult>(finalURL, initParams, ResourceType.TAG, ActionType.SHARE_TAG);
+
+  if (response.length > 1) {
+    logger.warn("There are more than 1 action response objects return. Loss of data can Occur. Please check with Back End.");
+  } else if (response.length <= 0) {
+    logger.error("No data returned. Please check with Back End.");
+    return false;
+  }
+
+  const responseAction = response[0];
+  if (responseAction.errors !== null && responseAction.errors.length > 0) {
+    logger.error("Response contains errors.");
+    logActionResponseErrors(response[0]);
+    return false;
+  } else if (responseAction.data === null) {
+    logger.error("Response data is null. URL=" + finalURL);
+    return false;
+  } else {
+    const tagShare:TagShareResult = responseAction.data;
+    if (tagShare.tag_id !== tagId) {
+      logger.error("Response tag ID doesn't match.");
+      return false;
+    } else if (tagShare.group_id !== groupId) {
+      logger.error("Response group ID doesn't match.");
+      return false;
+    } else {
+      return tagShare.action_successful;
+    }
+  }
+}
+
+export async function UnshareTagWithGroup(accessToken:string, tagId:number, groupId:number): Promise<boolean> {
+  const finalURL:string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/tag/unshare"
+
+  const shareTagData = {
+    share: [
+      {
+        tag_id: tagId,
+        group_id: groupId
+      }
+    ]
+  };
+
+  const initParams:RequestInit = {
+    method: 'POST',
+    headers: {
+      'accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + accessToken
+    },
+    body: JSON.stringify(shareTagData)
+  };
+
+  const response : ActionResponse<TagShareResult>[] = await MakeAPICall<TagShareResult>(finalURL, initParams, ResourceType.TAG, ActionType.SHARE_TAG);
+
+  if (response.length > 1) {
+    logger.warn("There are more than 1 action response objects return. Loss of data can Occur. Please check with Back End.");
+  } else if (response.length <= 0) {
+    logger.error("No data returned. Please check with Back End.");
+    return false;
+  }
+
+  const responseAction = response[0];
+  if (responseAction.errors !== null && responseAction.errors.length > 0) {
+    logger.error("Response contains errors.");
+    logActionResponseErrors(response[0]);
+    return false;
+  } else if (responseAction.data === null) {
+    logger.error("Response data is null. URL=" + finalURL);
+    return false;
+  } else {
+    const tagShare:TagShareResult = responseAction.data;
+    if (tagShare.tag_id !== tagId) {
+      logger.error("Response tag ID doesn't match.");
+      return false;
+    } else if (tagShare.group_id !== groupId) {
+      logger.error("Response group ID doesn't match.");
+      return false;
+    } else {
+      return tagShare.action_successful;
+    }
+  }
+}
+
+export async function DeleteTag(accessToken:string, tagId:number) : Promise<boolean> {
+  const finalURL:string = process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/tag/" + tagId;
+
+  const initParams:RequestInit = {
+      method: 'DELETE',
+      headers: {
+        'accept': 'application/json',
+        'Authorization': 'Bearer ' + accessToken
+      }
+    };
+
+  const response : ActionResponse<FilearchTag>[] = await MakeAPICall<FilearchTag>(finalURL, initParams, ResourceType.TAG, ActionType.DELETE);
+
+  if (response.length > 1) {
+    logger.warn("There are more than 1 action response objects return. Loss of data can Occur. Please check with Back End.");
+  } else if (response.length <= 0) {
+    logger.error("No data returned. Please check with Back End.");
+    return false;
+  }
+
+  const responseAction = response[0];
+  if (responseAction.errors !== null && responseAction.errors.length > 0) {
+    logger.error("Response contains errors.");
+    logActionResponseErrors(response[0]);
+    return false;
+  } else if (responseAction.data === null) {
+    logger.error("Response data is null. URL=" + finalURL);
+    return false;
+  } else {
+    const tagData:FilearchTag = responseAction.data;
+    if (tagData.id !== tagId) {
+      logger.error("Response tag ID doesn't match.");
+      return false;
+    } else {
+      return true;
+    }
+  }
 }

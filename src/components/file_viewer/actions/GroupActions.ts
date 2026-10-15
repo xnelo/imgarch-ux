@@ -1,7 +1,7 @@
 'use server';
 
-import { GroupItemType } from "@/filearch_api/FilearchAPI";
-import { RemoveGroupItem } from "@/filearch_api/group";
+import { FilearchGroup, GroupItemType } from "@/filearch_api/FilearchAPI";
+import { GetGroupsIn, RemoveGroupItem } from "@/filearch_api/group";
 import { getSession } from "@/lib/lib";
 import logger from "@/lib/logger";
 
@@ -13,4 +13,14 @@ export async function RemoveItemFromGroupAction(groupId:number, itemId: number, 
     return false;
   }
   return await RemoveGroupItem(session.access_token, groupId, itemId, itemType);
+}
+
+export async function GetAllGroupsIn(): Promise<FilearchGroup[] | null> {
+  logger.debug("Getting all groups a member is in.");
+  const session = await getSession();
+  if (session.access_token === undefined) {
+    logger.error("Access token is 'undefined'. Cannot call API.");
+    return null;
+  }
+  return await GetGroupsIn(session.access_token);
 }

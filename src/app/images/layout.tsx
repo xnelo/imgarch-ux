@@ -25,6 +25,9 @@ export default function UserLayout({
                       <a className={`nav-link ${segment === 'groups' ? 'active' : ''}`} href="/images/groups">Groups</a>
                     </li>
                     <li className="nav-item">
+                      <a className={`nav-link ${segment === 'tags' ? 'active' : ''}`} href="/images/tags">Tags</a>
+                    </li>
+                    <li className="nav-item">
                       <a className={`nav-link ${segment === 'search' ? 'active' : ''}`} href="/images/search">Search</a>
                     </li>
                   </ul>
