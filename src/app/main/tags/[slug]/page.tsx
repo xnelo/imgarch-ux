@@ -36,8 +36,8 @@ export default async function TagDetailPage({params,}: {params: Promise<{ slug: 
       <div className="container" style={{background:"var(--bs-light)", paddingBottom:"12px", paddingTop:"12px"}}>
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb">
-            <li className="breadcrumb-item"><a href="/images/">Home</a></li>
-            <li className="breadcrumb-item"><a href="/images/tags">Tags</a></li>
+            <li className="breadcrumb-item"><a href="/main/">Home</a></li>
+            <li className="breadcrumb-item"><a href="/main/tags">Tags</a></li>
             <li className="breadcrumb-item active" aria-current="page">{tagInfo.tag_name} ({slug})</li>
           </ol>
         </nav>

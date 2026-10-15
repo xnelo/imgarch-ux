@@ -19,16 +19,16 @@ export default function UserLayout({
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                   <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                     <li className="nav-item">
-                      <a className={`nav-link ${segment === 'folder' ? 'active' : ''}`} href="/images/folder">Folders</a>
+                      <a className={`nav-link ${segment === 'folder' ? 'active' : ''}`} href="/main/folder">Folders</a>
                     </li>
                     <li className="nav-item">
-                      <a className={`nav-link ${segment === 'groups' ? 'active' : ''}`} href="/images/groups">Groups</a>
+                      <a className={`nav-link ${segment === 'groups' ? 'active' : ''}`} href="/main/groups">Groups</a>
                     </li>
                     <li className="nav-item">
-                      <a className={`nav-link ${segment === 'tags' ? 'active' : ''}`} href="/images/tags">Tags</a>
+                      <a className={`nav-link ${segment === 'tags' ? 'active' : ''}`} href="/main/tags">Tags</a>
                     </li>
                     <li className="nav-item">
-                      <a className={`nav-link ${segment === 'search' ? 'active' : ''}`} href="/images/search">Search</a>
+                      <a className={`nav-link ${segment === 'search' ? 'active' : ''}`} href="/main/search">Search</a>
                     </li>
                   </ul>
                 </div>

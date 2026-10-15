@@ -22,7 +22,7 @@ export default async function TagsPage() {
             <div className={`container ${styles.TagManagementContainer}`}>
               <nav aria-label="breadcrumb">
                 <ol className="breadcrumb">
-                  <li className="breadcrumb-item"><a href="/images/">Home</a></li>
+                  <li className="breadcrumb-item"><a href="/main/">Home</a></li>
                   <li className="breadcrumb-item active" aria-current="page">Tags</li>
                 </ol>
               </nav>
