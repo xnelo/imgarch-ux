@@ -1,0 +1,216 @@
+'use client'
+
+import Modal from 'react-bootstrap/Modal';
+import { ChangeEvent, useEffect, useState } from "react";
+import { FileItem } from './FileItem';
+import styles from "./FileViewer.module.css";
+import { DownloadImage } from './actions/DownloadImage';
+import { Accordion, Button, Form } from 'react-bootstrap';
+import { GetTagsForFile } from './actions/Tags';
+import { FilearchTag } from '@/filearch_api/tag';
+import TagSearch from './TagSearch';
+import TagViewItem, { TagItem } from './TagViewItem';
+import { AccordionEventKey } from 'react-bootstrap/esm/AccordionContext';
+import ShareTagModal from './ShareTagModal';
+
+const DEFAULT_IMAGE_ZOOM: number = 100;
+const MIN_IMAGE_ZOOM: number = 25;
+const MAX_IMAGE_ZOOM: number = 400;
+const IMAGE_ZOOM_STEP: number = 5;
+const LOCAL_STORAGE_KEY_TOOL_ACTIVE_KEY = "fileViewerAccordionActiveKey";
+
+export default function FileViewerModal({ show, fileItemToShow, onHideCallback, groupViewId }: { show: boolean, fileItemToShow: FileItem | undefined, onHideCallback: () => void, groupViewId: number|undefined }) {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
+  const [imgZoom, setImgZoom] = useState<number>(DEFAULT_IMAGE_ZOOM);
+  const [imgTags, setImgTags] = useState<TagItem[] | null>(null);
+
+  const handleOnShow = async () => {
+    setImgUrl(null);
+    getImageToDisplay();
+    handleResetImageZoom();
+    getImageTags();
+  }
+
+  const getImageTags = async () => {
+    setImgTags(null);
+    if (fileItemToShow !== undefined) {
+      const tagsArray = await GetTagsForFile(fileItemToShow.id, groupViewId);
+      if (tagsArray !== null) {
+        let finalTags: TagItem[] = [];
+        tagsArray.forEach((filearchTag: FilearchTag) => {
+          finalTags.push({ id: filearchTag.id, tagName: filearchTag.tag_name });
+        });
+        setImgTags(finalTags);
+      }
+    }
+  }
+
+  const getImageToDisplay = async () => {
+    setIsLoading(true);
+    if (fileItemToShow !== undefined) {
+      const rawImageData = await DownloadImage(fileItemToShow.id, groupViewId);
+      if (rawImageData === null) {
+        setImgUrl(null);
+      } else {
+        var blob = new Blob([rawImageData], { type: fileItemToShow.mimeType });
+        var imageUrl = URL.createObjectURL(blob);
+        setImgUrl(imageUrl);
+      }
+      setIsLoading(false);
+    }
+  }
+
+  function handleZoomIn() {
+    let imgZoomCalc = imgZoom + IMAGE_ZOOM_STEP;
+    if (imgZoomCalc > MAX_IMAGE_ZOOM) {
+      imgZoomCalc = MAX_IMAGE_ZOOM;
+    }
+    setImgZoom(imgZoomCalc);
+  }
+
+  function handleZoomOut() {
+    let imgZoomCalc = imgZoom - IMAGE_ZOOM_STEP;
+    if (imgZoomCalc <= MIN_IMAGE_ZOOM) {
+      imgZoomCalc = MIN_IMAGE_ZOOM;
+    }
+    setImgZoom(imgZoomCalc);
+  }
+
+  function handleResetImageZoom() {
+    setImgZoom(DEFAULT_IMAGE_ZOOM);
+  }
+
+  function handleZoomeRangeInput(ele: ChangeEvent<HTMLInputElement>) {
+    setImgZoom(Number.parseInt(ele.target.value));
+  }
+
+  function tagAddedToFile(filearchTag: FilearchTag) {
+    const newTagItem: TagItem = { id: filearchTag.id, tagName: filearchTag.tag_name };
+    if (imgTags !== null) {
+      setImgTags([...imgTags, newTagItem]);
+    } else {
+      setImgTags([newTagItem]);
+    }
+  }
+
+  function tagRemovedFromFile(tagId: number) {
+    if (imgTags !== null) {
+      const newTagItems = imgTags.filter(tag => tag.id !== tagId);
+      setImgTags(newTagItems);
+    }
+  }
+
+  const [activAccordionKeys, setActiveAccordionKeys] = useState<AccordionEventKey>(null);
+
+  useEffect(() => {
+    // Load state from local storage on mount
+    const savedKey = localStorage.getItem(LOCAL_STORAGE_KEY_TOOL_ACTIVE_KEY);
+    if (savedKey) {
+      setActiveAccordionKeys(savedKey);
+    }
+  }, []);
+
+  function handleAccordionSelect(eventKey: AccordionEventKey | null) {
+    setActiveAccordionKeys(eventKey);
+    localStorage.setItem(LOCAL_STORAGE_KEY_TOOL_ACTIVE_KEY, eventKey === null || eventKey === undefined ? "" : eventKey.toString());
+  }
+
+  const [showTagModal, setShowTagModal] = useState<boolean>(false);
+  const [tagModalTagData, setTagModalTagData] = useState<TagItem|undefined>(undefined);
+
+  function showTagModalCallback(tagId:number){
+    const tagData = imgTags?.find(tag=>tag.id == tagId);
+
+    if (tagData === undefined) {
+      return; // DO NOTHING
+    }
+
+    setShowTagModal(true);
+    setTagModalTagData(tagData);
+  }
+
+  function onTagModalHideCallback() {
+    setShowTagModal(false);
+  }
+
+  return (
+    <>
+    <ShareTagModal
+      show={showTagModal}
+      tagItemToShow={tagModalTagData}
+      onHideCallback={onTagModalHideCallback}
+    />
+    <Modal show={show} fullscreen={true} onShow={handleOnShow} onHide={onHideCallback} style={{ zIndex: 9998 }}>
+      <Modal.Header closeButton>
+        <Modal.Title>{fileItemToShow?.originalFilename}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <div className='container-fluid'>
+          {isLoading ?
+            <div className='position-absolute top-50 start-50 translate-middle'>
+              <div>
+                <img className={styles.rotate_image} src="/loading.png" width={100} height={100} style={{ filter: 'invert(1) opacity(0.333)' }} />
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                Loading...
+              </div>
+            </div> :
+            (imgUrl === null ?
+              <div>NO IMAGE</div> :
+              <div className='position-absolute'
+                style={{
+                  left: '0px',
+                  padding: '1rem',
+                  width: '80vw',
+                  height: '91.4vh',
+                  overflow: 'scroll'
+                }}>
+                <img src={imgUrl} style={{ width: `${imgZoom}%` }} />
+              </div>
+            )}
+          <div className='position-absolute border-start border-1'
+            style={{
+              width: '20vw',
+              padding: '1rem',
+              left: '80vw',
+              height: '91.4vh'
+            }}>
+            <Accordion defaultActiveKey={activAccordionKeys} onSelect={handleAccordionSelect} alwaysOpen>
+              <Accordion.Item eventKey="0">
+                <Accordion.Header>Zoom</Accordion.Header>
+                <Accordion.Body>
+                  <Button onClick={handleZoomIn}><i className="bi bi-zoom-in"></i></Button>
+                  <span>{imgZoom}%</span>
+                  <Button onClick={handleZoomOut}><i className="bi bi-zoom-out"></i></Button>
+                  <Button onClick={handleResetImageZoom}><i className="bi bi-arrow-counterclockwise"></i></Button>
+                  <Form.Range min={MIN_IMAGE_ZOOM} step={IMAGE_ZOOM_STEP} max={MAX_IMAGE_ZOOM} value={imgZoom} onChange={handleZoomeRangeInput} id='zoomRange' />
+                </Accordion.Body>
+              </Accordion.Item>
+              <Accordion.Item eventKey="1">
+                <Accordion.Header>Tags</Accordion.Header>
+                <Accordion.Body>
+                  <TagSearch fileId={fileItemToShow?.id} tagAddedCallback={tagAddedToFile} groupViewId={groupViewId} />
+                  <div className='mt-2'>
+                    {(imgTags === null || imgTags.length <= 0) ?
+                      <span>NO TAGS</span> :
+                      imgTags.map(tag => <TagViewItem key={tag.id} tagItem={tag} fileOn={fileItemToShow?.id} tagRemovedCallback={tagRemovedFromFile} showTagModalCallback={showTagModalCallback} groupViewId={groupViewId}/>)
+                    }
+                  </div>
+                </Accordion.Body>
+              </Accordion.Item>
+              <Accordion.Item eventKey="2">
+                <Accordion.Header>Metadata</Accordion.Header>
+                <Accordion.Body>
+                  <div><b>Original Filename:</b> {fileItemToShow?.originalFilename}</div>
+                  <div><b>Mime Type:</b> {fileItemToShow?.mimeType}</div>
+                </Accordion.Body>
+              </Accordion.Item>
+            </Accordion>
+          </div>
+        </div>
+      </Modal.Body>
+    </Modal>
+    </>
+  );
+}

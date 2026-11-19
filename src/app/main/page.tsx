@@ -1,8 +1,9 @@
-export default async function ImagesPage() {
+export default async function MainPage() {
   return (
           <main>
               <h2>Images Home</h2>
               <ul>
+                <li><a href="/main/images">Images</a></li>
                 <li><a href="/main/folder">Folder View</a></li>
                 <li><a href="/main/groups">Groups Managment</a></li>
                 <li><a href="/main/tags">Tag Management</a></li>

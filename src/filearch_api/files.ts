@@ -1,7 +1,22 @@
 import logger from "@/lib/logger";
-import { ActionResponse, FilearchAPIResponse, FilearchFile, PaginationContract, ResourceType, SortDirection, StorageType } from "./FilearchAPI";
-import { logActionResponseErrors, MakeAPICall, SinglePaginatedCall } from "./FilearchAPI_ServerFunctions";
+import { ActionResponse, ActionType, FilearchAPIResponse, FilearchFile, PaginationContract, ResourceType, SortDirection, StorageType } from "./FilearchAPI";
+import { GetAllPaginatedData, logActionResponseErrors, MakeAPICall, SinglePaginatedCall } from "./FilearchAPI_ServerFunctions";
 import { group } from "console";
+import { FilearchFolder } from "./folder";
+
+export async function GetAllUserFiles(
+  accessToken:string,
+  limitPerCall:number) : Promise<FilearchFile[] | null> {
+  const data: FilearchFile[] | null = 
+    await GetAllPaginatedData<FilearchFile>(
+      accessToken,
+      process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file",
+      SortDirection.ASCENDING,
+      limitPerCall,
+      ResourceType.FILE);
+
+  return data;
+}
 
 export async function GetPaginatedSearchFiles(
   accessToken:string, 
@@ -159,4 +174,49 @@ export async function DeleteFile(fileId: number, accessToken: string) : Promise<
       return null;
     }
   }
+}
+
+export async function GetFileInfo(accessToken: string, fileId: number) : Promise<ActionResponse<FilearchFile>> {
+
+  const requestInfo = {
+    method: 'GET',
+    headers: {
+      'accept': 'application/json',
+      'Authorization': 'Bearer ' + accessToken
+    }
+  };
+
+  const fileData : ActionResponse<FilearchFile>[] = await MakeAPICall(
+    process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId,
+    requestInfo,
+    ResourceType.FILE,
+    ActionType.GET);
+  
+  if (fileData.length !== 1) {
+    logger.error("To many responses returned. Only returning the first one. Please contact support.");
+  }
+
+  return fileData[0];
+}
+
+export async function GetFolderPath(accessToken: string, fileId: number) : Promise<ActionResponse<FilearchFolder[]>> {
+  const requestInfo = {
+    method: 'GET',
+    headers: {
+      'accept': 'application/json',
+      'Authorization': 'Bearer ' + accessToken
+    }
+  }
+
+  const folderPathData: ActionResponse<FilearchFolder[]>[] = await MakeAPICall(
+    process.env.NEXT_PUBLIC_FILEARCH_API_URL + "/file/" + fileId + "/folder_path",
+    requestInfo,
+    ResourceType.FOLDER,
+    ActionType.GET);
+  
+  if (folderPathData.length !== 1) {
+    logger.error("To many responses returned. Only returning the first one. Please contact support.");
+  }
+
+  return folderPathData[0];
 }

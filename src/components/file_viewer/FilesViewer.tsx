@@ -2,7 +2,7 @@ import { CSSProperties, useEffect, useState } from "react";
 import { FileItem } from "./FileItem";
 import FileItemView from "./FileItemView";
 import { useInView } from "react-intersection-observer";
-import FileViewer from "./FileViewer";
+import FileViewerModal from "./FileViewerModal";
 import { FilearchFile, FilearchGroupFile, PaginationContract } from "@/filearch_api/FilearchAPI";
 
 function isGroupFile(toCheck:any): toCheck is FilearchGroupFile {
@@ -104,7 +104,7 @@ export default function FilesViewer(
 
   return (
     <>
-      <FileViewer
+      <FileViewerModal
         show={show}
         fileItemToShow={shownFileItem}
         onHideCallback={handleCloseSelectedImage}
