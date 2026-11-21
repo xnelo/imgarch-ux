@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import { MoveFolderAction } from "./actions/FolderActions";
 
 export default function FolderTreeItemView({data, selectFolderFunc, selectedFolderState, moveFolderEventComplete}:{data:FolderItem, selectFolderFunc:(selectedFolderId:number)=>void, selectedFolderState:number, moveFolderEventComplete:(idToMove: number, idNewParent: number, idOldParent: number)=>void}){
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(data.isDescendantId(selectedFolderState));
     const [folderToMove, setFolderToMove] = useState<FolderItem|undefined>(undefined);
     const [folderToMoveTo, setFolderToMoveTo] = useState<FolderItem|undefined>(undefined);
 
