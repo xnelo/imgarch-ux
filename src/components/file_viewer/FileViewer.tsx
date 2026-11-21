@@ -197,7 +197,7 @@ export default function FileViewer({fileData, height, groupViewId}:{fileData:Fil
                 <div><b>File Id:</b> {fileData?.id}</div>
                 <div><b>Original Filename:</b> {fileData?.original_filename}</div>
                 <div><b>Mime Type:</b> {fileData?.mime_type}</div>
-                <div><b>Folder:</b> {folderPath === null ? <span>ERROR</span>:folderPath.map(f=><a>{f.folder_name}/</a>)}</div>
+                <div><b>Folder:</b> {folderPath === null ? <span>ERROR</span>:folderPath.map(f=><a key={f.id} href={`/main/folder?opened=${f.id}`}>{f.folder_name}/</a>)}</div>
               </Accordion.Body>
             </Accordion.Item>
           </Accordion>

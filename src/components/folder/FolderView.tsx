@@ -10,6 +10,9 @@ import RenameFolder from "./tree/action_buttons/RenameFolder";
 import DeleteFolder from "./tree/action_buttons/DeleteFolder";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export const NO_FOLDER_SELECTED: number = -1;
 
@@ -90,7 +93,8 @@ function findItemInTree(root: FolderItem | undefined, idToFind: number): FolderI
 }
 
 export default function FolderView({ folders }: { folders: Promise<FilearchFolder[] | null> }) {
-
+  const searchParams = useSearchParams();
+  const openedFolder: number | null = Number(searchParams.get("opened")) || null;
 
   const allFolders = use(folders);
   if (allFolders === null) {
@@ -107,16 +111,23 @@ export default function FolderView({ folders }: { folders: Promise<FilearchFolde
   }
 
   let [rootFolder, setRootFolder] = useState<FolderItem | undefined>(tmpRoot);
-  let [selectedFolder, setSelectedFolder] = useState(NO_FOLDER_SELECTED);
-  let [selectedFolderItem, setSelectedFolderItem] = useState<FolderItem | undefined>(undefined);
+  const selectedFolder = openedFolder === null ? NO_FOLDER_SELECTED : openedFolder;
+  const selectedFolderItem = findItemInTree(rootFolder, selectedFolder);
 
-  function selectFolderEvent(selectedFolderId: number) {
+  const router:AppRouterInstance = useRouter();
+  const pathName:string = usePathname();
+
+  function selectFolderEvent(selectedFolderId: number, pushNewRoute: boolean = true) {
     if (selectedFolderId === selectedFolder) {
-      setSelectedFolder(NO_FOLDER_SELECTED);
-      setSelectedFolderItem(undefined);
+        router.push(pathName);
     } else {
-      setSelectedFolder(selectedFolderId);
-      setSelectedFolderItem(findItemInTree(rootFolder, selectedFolderId));
+      const foundFolderItem:FolderItem|undefined = findItemInTree(rootFolder, selectedFolderId);
+      if (foundFolderItem === undefined){
+        toast.error("Requested folder " + selectedFolderId + " not found.");
+        router.push(`${pathName}?opened=${selectedFolderId}`);
+      } else {
+        router.push(`${pathName}?opened=${selectedFolderId}`);
+      }
     }
   }
 
@@ -191,7 +202,9 @@ export default function FolderView({ folders }: { folders: Promise<FilearchFolde
             left: '25vw'
           }}>
           <Suspense fallback={<div>Loading...</div>}>
-            <FolderContentView selectedFolderItem={selectedFolderItem} />
+            {(selectedFolderItem === undefined) 
+              ? <div style={{textAlign:'center', top:'calc(50vh - 7.75rem)', position:'relative', fontSize:'5rem'}}>FOLDER NOT FOUND!</div> 
+              : <FolderContentView selectedFolderItem={selectedFolderItem} />}
           </Suspense>
         </div>
       </div>
